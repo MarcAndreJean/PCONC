@@ -1,0 +1,1 @@
+Exécuter "ProjetConception.pyw" pour démarrer le logiciel.
