@@ -7,27 +7,23 @@
 
     Identification  : 01-02-Editeur
     Titre           : Interface Editeur
-    Auteurs         : Francis Emond, Malek Khattech, Marc-André Jean
+    Auteurs         : Francis Emond, Malek Khattech,
+                      Mamadou Dia, Marc-André Jean
     Date            : 27-04-2017
     Description     : Interface editeur de l'application.
 
 
 """
 
-__author__ = "Francis Emond, Malek Khattech, Marc-Andre Jean"
+__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
 
+# Importation des modules nécessaires.
+modFunctEditor = __import__("02-FonctionEditeur")
+modCompiler = __import__("03-Compileur")
 
-#try:
-#    __import__("01-01-Ordinateur")
-#    __import__("01-02-Editeur")
-#except ImportError:
-#    import importlib
-#    importlib.import_module("Modules.01-01-Ordinateur")
-#    importlib.import_module("Modules.01-02-Editeur")
-
-
+# Importation de Tkinter selon la version de Python.
 # Python 2 seulement:
 try:
     from Tkinter import *
@@ -39,32 +35,47 @@ except ImportError:
     Le module ``VueEditeur``
     ================================
 
-    Description
+    Ce module contient la vue « Editeur » telle que présentrée dans le
+    document de spécification.
+
 
 """
+
 
 class VueEditeur(Frame):
     """
         class VueEditeur
         ========================
 
-        Description
+        Cette classe hérite d'un Frame. Elle représente la vue
+        « Editeur » telle que présentée dans le document de
+        spécification. Le Frame inclut les boutons et autres Widgets
+        nécessaires pour la vue.
 
 
     """
 
     # Constructeur.
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         """
-            Title
+            Constructeur de la classe VueOrdinateur.
 
-            Description
+            Le constructeur initialise le Frame de la classe avec le Widget
+            parent donné en argument. Il initialise ensuite les Widgets
+            nécessaires de la vue (comme décrit dans le document de
+            spécification). Les fonctions du module « 02-FonctionEditeur »
+            et du module « 03-Compileur » seront liés aux évènements
+            associés (par exemple les boutons de la vue).
 
-            :param parent:
-            :type parent:
+            :param parent: Parent Widget de la classe.
+            :type parent: Widget (Tk)
 
-            .. warning::
+            .. warning:: Cette classe a besoin d'avoir accès aux modules
+                         « 02-FonctionEditeur » et « 03-Compileur ».
+
+
         """
         # Initialise le Frame de l'instance.
         Frame.__init__(self, parent)
 
+        # TODO: Écrire du code x')

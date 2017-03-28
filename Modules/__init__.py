@@ -1,4 +1,4 @@
-# Importation des modules locals.
+# Importation des modules locaux.
 import importlib
 gui = importlib.import_module("Modules.01-Vue")
 functEditeur = importlib.import_module("Modules.02-FonctionEditeur")

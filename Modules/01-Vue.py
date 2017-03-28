@@ -7,27 +7,24 @@
 
     Identification  : 01-Vue
     Titre           : GUI principal
-    Auteurs         : Francis Emond, Malek Khattech, Marc-André Jean
+    Auteurs         : Francis Emond, Malek Khattech,
+                      Mamadou Dia, Marc-André Jean
     Date            : 27-04-2017
     Description     : GUI principal de l'application.
 
 
 """
 
-__author__ = "Francis Emond, Malek Khattech, Marc-Andre Jean"
+__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
 
 
-try:
-    modOrdinateur = __import__("01-01-Ordinateur")
-    modEditeur = __import__("01-02-Editeur")
-except ImportError:
-    import importlib
-    modOrdinateur = importlib.import_module("Modules.01-01-Ordinateur")
-    modEditeur = importlib.import_module("Modules.01-02-Editeur")
+# Importation des modules nécessaires.
+modOrdinateur = __import__("01-01-Ordinateur")
+modEditeur = __import__("01-02-Editeur")
 
-
+# Importation de Tkinter selon le version de Python.
 # Python 2 seulement:
 try:
     from Tkinter import *
@@ -47,38 +44,59 @@ except ImportError:
 
 """
 
+
 class VueGlobal(Frame):
     """
         class VueGlobal
         ========================
 
-        Description
+        Cette classe hérite d'un Widget Frame. Ce Frame va inclure un
+        gestionnaire d'onglet qui contient une collection de vue (classe
+        Notebook de Tk). Ce widget Notebook permet la sélection entre les
+        deux vues principales du programme : la vue « Ordinateur » et la
+        vue « Editeur ». Pour d'amples informations, se référer au document
+        de spécifications avec le croquis des interfaces.
 
 
     """
 
     # Constructeur.
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         """
-            Title
+            Constructeur de VueGlobal.
 
-            Description
+            Le constructeur initialise son Frame avec le parent qui est
+            donné en argument. Il initialise un gestionnaire d'onglet
+            (Widget Notebook) et l'ajoute dans le Frame. Il initialise
+            ensuite les deux sous-vues et les ajoute dans le gestionnaire
+            d'onglet.
 
-            :param parent:
-            :type parent:
+            :param parent: Widget Parent de la classe.
+            :type parent: Widget (Tk)
 
-            .. warning::
+            .. warning:: Cette classe a besoin d'avoir le module
+              « 01-01-Ordinateur » et le module « 01-02-Editeur »
+              accessible.
+
+
         """
         # Initialise le Frame de l'instance.
         Frame.__init__(self, parent)
+
         # Crée la composante graphique qui va controler le gui Ordinateur
         # et Editeur avec un tabs.
         self.vueTabs = Notebook(self)
+
+        # Crée les deux sous-vues.
         self.vueOrdinateur = modOrdinateur.VueOrdinateur(self.vueTabs)
         self.vueEditeur = modEditeur.VueEditeur(self.vueTabs)
+
+        # Pack les vues dans le gestionnaire d'onglet (Tab) et Pack le
+        # gestionnaire d'onglet dans le parent.
         self.vueTabs.pack(fill=BOTH, padx=2, pady=3)
         self.vueOrdinateur.pack(fill=BOTH)
         self.vueEditeur.pack(fill=BOTH)
+
+        # Ajoute les deux sous-vues dans le gestionnaire d'onglet.
         self.vueTabs.add(self.vueOrdinateur, text="Ordinateur")
         self.vueTabs.add(self.vueEditeur, text="Editeur")
-
