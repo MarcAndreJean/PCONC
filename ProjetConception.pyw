@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # Création de la vue globale dans le root.
     vueGlobal = modVue.VueGlobal(root)
-    vueGlobal.pack(fill=BOTH)
+    vueGlobal.pack(fill=BOTH, expand=True)
 
     # Définition des paramètres pour le root.
     root.wm_minsize(800, 600)

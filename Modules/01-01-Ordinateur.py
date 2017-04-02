@@ -20,7 +20,11 @@ __version__ = "1.0"
 __status__ = "Production"
 
 # Importation des modules nécessaires.
-modComputer = __import__("04-Micro-Ordinateur")
+try:
+    modComputer = __import__("04-Micro-Ordinateur")
+except ImportError:
+    import importlib
+    modComputer = importlib.import_module("Modules.04-Micro-Ordinateur")
 
 # Importation de Tkinter selon la version de Python.
 # Python 2 seulement:
@@ -79,14 +83,6 @@ class VueOrdinateur(Frame):
         # Initialise le Frame de l'instance.
         Frame.__init__(self, parent)
 
-        # Création du Grid inclut dans le parent.
-        # Fixation d'un "poids" pour chacune des cellules, pour que les
-        # cellules s'étire et que le «Grid» remplit l'espace requis.
-        for x in range(7):
-            Grid.rowconfigure(self, x, weight=1)
-        for y in range(4):
-            Grid.columnconfigure(self, y, weight=1)
-
         # Création des widgets nécessaires.
         # --StringVar.
         self.txtvarToggleClock = StringVar()
@@ -94,17 +90,46 @@ class VueOrdinateur(Frame):
         self.txtvarConsoleOutput = StringVar()
         self.txtvarConsoleOutput.set("Console Output")
         # --Button.
-        self.butCharger = Button(self, text="Charger programme")
-        self.butReset = Button(self, text="Réinitialiser")
-        self.butTick = Button(self, text="Générer un coup d'horloge")
-        self.butClock = Button(self, textvariable=self.txtvarToggleClock)
+        self.frameBut = Frame(self)
+        self.butCharger = Button(self.frameBut, text="Charger programme")
+        self.butReset = Button(self.frameBut, text="Réinitialiser")
+        self.butTick = Button(self.frameBut,
+                              text="Générer un coup d'horloge")
+        self.butClock = Button(self.frameBut,
+                               textvariable=self.txtvarToggleClock)
+        self.butCharger.pack(fill=X, padx=3, pady=10, ipady=20)
+        self.butReset.pack(fill=X, padx=30, pady=3, ipady=10)
+        self.butTick.pack(fill=X, padx=10, pady=3, ipady=12)
+        self.butClock.pack(fill=X, padx=10, pady=3, ipady=12)
+        self.frameBut.grid(column=0, row=1, sticky="WE")
         # --Label.
-        self.txtConsoleOutput = Label(self,
-                                      textvariable=self.txtvarConsoleOutput)
+        self.frameCout = Frame(self)
+        self.labelCout = Label(self.frameCout,
+                             text="Console Output")
+        self.txtConsoleOutput = Label(self.frameCout,
+                                      textvariable=self.txtvarConsoleOutput,
+                                      width=0,
+                                      relief=GROOVE, background="white")
+        self.labelCout.pack(fill=X, padx=3, pady=5)
+        self.txtConsoleOutput.pack(fill=BOTH, padx=3, pady=5, expand=True)
+        self.frameCout.grid(column=1, row=0, rowspan=3, sticky="NSWE")
         # --Text.
-        self.txtConsoleInput = Text(self)
+        self.frameCin = Frame(self)
+        self.labelCin = Label(self.frameCin,
+                              text="Console Input")
+        
+        self.innerFrameCin = Frame(self.frameCin, relief=SUNKEN)
+        self.txtConsoleInput = Text(self.innerFrameCin, width=0, relief=FLAT)
+        self.labelCin.pack(fill=X, padx=3, pady=5)
+        self.innerFrameCin.pack(fill=BOTH,
+                                padx=3, pady=5, expand=True)
+        self.txtConsoleInput.pack(fill=BOTH, padx=3, pady=3, expand=True)
+        self.frameCin.grid(column=2, row=0, rowspan=3, sticky="NSWE")
         # --Notebook.
-        self.tabMemoireChooser = Notebook(self)
+        self.tabMemoireChooser = Notebook(self, width=0)
+        self.tabMemoireChooser.grid(column=3, row=0, rowspan=3,
+                                    sticky="NSWE",
+                                    padx=3, pady=8)
         # --Listbox.
         self.listMemoireRAM = Listbox(self.tabMemoireChooser)
         self.listMemoireROM = Listbox(self.tabMemoireChooser)
@@ -115,20 +140,16 @@ class VueOrdinateur(Frame):
         self.tabMemoireChooser.add(self.listMemoireROM, text="ROM")
         self.tabMemoireChooser.add(self.listMemoireIO, text="IO")
 
-        # Placement dans le Grid.
-        self.butCharger.grid(sticky=(N, S, W, E), column=0, row=2)
-        self.butReset.grid(sticky=(N, S, W, E), column=0, row=3)
-        self.butTick.grid(sticky=(N, S, W, E), column=0, row=4)
-        self.butClock.grid(sticky=(N, S, W, E), column=0, row=5)
-
-        self.txtConsoleOutput.grid(sticky=(N, S, W, E),
-                                   column=1, row=0, rowspan=7)
-        self.txtConsoleInput.grid(sticky=(N, S, W, E),
-                                  column=2, row=0, rowspan=7)
-        self.tabMemoireChooser.grid(sticky=(N, S, W, E),
-                                    column=3, row=0, rowspan=7)
         # TODO: Régler la vue (grid, pack, etc.)
         # TODO: Création et linkage du Micro-Ordinateur.
+        # Création du Grid inclut dans le parent.
+        # Fixation d'un "poids" pour chacune des cellules, pour que les
+        # cellules s'étire et que le «Grid» remplit l'espace requis.
+        for y in range(3):
+            self.grid_rowconfigure(y, weight=1)
+        for x in range(1,4):
+            self.grid_columnconfigure(x, weight=1)
+        self.grid_columnconfigure(0, weight=0)
 
     def setTextButToggleClock(self, text):
         """

@@ -20,8 +20,14 @@ __version__ = "1.0"
 __status__ = "Production"
 
 # Importation des modules nécessaires.
-modFunctEditor = __import__("02-FonctionEditeur")
-modCompiler = __import__("03-Compileur")
+try:
+    modFunctEditor = __import__("02-FonctionEditeur")
+    modCompiler = __import__("03-Compileur")
+except ImportError:
+    import importlib
+    modFunctEditor = importlib.import_module("Modules.02-FonctionEditeur")
+    modCompiler = importlib.import_module("Modules.03-Compileur")
+    
 
 # Importation de Tkinter selon la version de Python.
 # Python 2 seulement:

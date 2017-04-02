@@ -21,9 +21,14 @@ __status__ = "Production"
 
 
 # Importation des modules nécessaires.
-modOrdinateur = __import__("01-01-Ordinateur")
-modEditeur = __import__("01-02-Editeur")
-
+try:
+    modOrdinateur = __import__("01-01-Ordinateur")
+    modEditeur = __import__("01-02-Editeur")
+except ImportError:
+    import importlib
+    modOrdinateur = importlib.import_module("Modules.01-01-Ordinateur")
+    modEditeur = importlib.import_module("Modules.01-02-Editeur")
+    
 # Importation de Tkinter selon le version de Python.
 # Python 2 seulement:
 try:
@@ -93,9 +98,9 @@ class VueGlobal(Frame):
 
         # Pack les vues dans le gestionnaire d'onglet (Tab) et Pack le
         # gestionnaire d'onglet dans le parent.
-        self.vueTabs.pack(fill=BOTH, padx=2, pady=3)
-        self.vueOrdinateur.pack(fill=BOTH)
-        self.vueEditeur.pack(fill=BOTH)
+        self.vueTabs.pack(fill=BOTH, padx=2, pady=3, expand=True)
+        self.vueOrdinateur.pack(fill=BOTH, expand=True)
+        self.vueEditeur.pack(fill=BOTH, expand=True)
 
         # Ajoute les deux sous-vues dans le gestionnaire d'onglet.
         self.vueTabs.add(self.vueOrdinateur, text="Ordinateur")
