@@ -9,7 +9,7 @@
     Titre           : GUI principal
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 27-04-2017
+    Date            : 10-04-2017
     Description     : GUI principal de l'application.
 
 
@@ -28,12 +28,12 @@ except ImportError:
     import importlib
     modOrdinateur = importlib.import_module("Modules.01-01-Ordinateur")
     modEditeur = importlib.import_module("Modules.01-02-Editeur")
-    
+
 # Importation de Tkinter selon le version de Python.
 # Python 2 seulement:
 try:
     from Tkinter import *
-    from Tkinter.ttk import *
+    from ttk import *
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
@@ -105,3 +105,6 @@ class VueGlobal(Frame):
         # Ajoute les deux sous-vues dans le gestionnaire d'onglet.
         self.vueTabs.add(self.vueOrdinateur, text="Ordinateur")
         self.vueTabs.add(self.vueEditeur, text="Editeur")
+
+        # Fin de __init__.
+        return

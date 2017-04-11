@@ -9,7 +9,7 @@
     Titre           : Interface Ordinateur
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 27-04-2017
+    Date            : 10-04-2017
     Description     : Interface ordinateur de l'application.
 
 
@@ -30,7 +30,7 @@ except ImportError:
 # Python 2 seulement:
 try:
     from Tkinter import *
-    from Tkinter.ttk import *
+    from ttk import *
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
@@ -80,6 +80,11 @@ class VueOrdinateur(Frame):
 
 
         """
+        # Crée un Micro-Ordinateur pour cette interface
+        self.computer = modComputer.MicroOrdinateur()
+        self.code = ""
+        self.boolClock = False
+
         # Initialise le Frame de l'instance.
         Frame.__init__(self, parent)
 
@@ -105,19 +110,22 @@ class VueOrdinateur(Frame):
         # --Label.
         self.frameCout = Frame(self)
         self.labelCout = Label(self.frameCout,
-                             text="Console Output")
-        self.txtConsoleOutput = Label(self.frameCout,
-                                      textvariable=self.txtvarConsoleOutput,
-                                      width=0,
-                                      relief=GROOVE, background="white")
+                               text="Console Output")
+        self.txtConsoleOutput = Label(
+            self.frameCout,
+            textvariable=self.txtvarConsoleOutput,
+            width=0,
+            relief=GROOVE,
+            background="white",
+            anchor=SW)
         self.labelCout.pack(fill=X, padx=3, pady=5)
         self.txtConsoleOutput.pack(fill=BOTH, padx=3, pady=5, expand=True)
         self.frameCout.grid(column=1, row=0, rowspan=3, sticky="NSWE")
         # --Text.
         self.frameCin = Frame(self)
-        self.labelCin = Label(self.frameCin,
+        self.labelCin = Label(self.frameCin, anchor=S,
                               text="Console Input")
-        
+
         self.innerFrameCin = Frame(self.frameCin, relief=SUNKEN)
         self.txtConsoleInput = Text(self.innerFrameCin, width=0, relief=FLAT)
         self.labelCin.pack(fill=X, padx=3, pady=5)
@@ -140,30 +148,78 @@ class VueOrdinateur(Frame):
         self.tabMemoireChooser.add(self.listMemoireROM, text="ROM")
         self.tabMemoireChooser.add(self.listMemoireIO, text="IO")
 
-        # TODO: Régler la vue (grid, pack, etc.)
-        # TODO: Création et linkage du Micro-Ordinateur.
         # Création du Grid inclut dans le parent.
         # Fixation d'un "poids" pour chacune des cellules, pour que les
         # cellules s'étire et que le «Grid» remplit l'espace requis.
         for y in range(3):
             self.grid_rowconfigure(y, weight=1)
-        for x in range(1,4):
+        for x in range(1, 4):
             self.grid_columnconfigure(x, weight=1)
         self.grid_columnconfigure(0, weight=0)
 
-    def setTextButToggleClock(self, text):
+        # Liaison des évènements.
+        self.butCharger.configure(command=self.callbackCharger)
+        self.butReset.configure(command=self.callbackReset)
+        self.butTick.configure(command=self.callbackTick)
+        self.butClock.configure(command=self.callbackClock)
+
+        # Fin de __init__.
+        return
+
+    def callbackCharger(self):
+        # Fin de callbackCharger.
+        return
+
+    def callbackReset(self):
         """
-            Accesseur (setter) pour le texte du bouton « Démarrer/Arrêter
-            l'horloge »
+            Réinitialise le micro-ordinateur avec le précédent exécutable.
 
-            Cette fonction renomme le bouton « Démarrer/Arrêter l'horloge ».
-
-            :param text: Nouveau texte du bouton.
-            :type text: str
+            Cette fonction appelle la fonction appropriée dans le module
+            04-Micro-Ordinateur pour réinitialiser l'état de la machine
+            virtuelle (et en rechargeant en mémoire le dernier exécutable
+            charger ultérieurement, s'il y a eu lieu).
 
 
         """
-        self.txtvarToggleClock.set(text)
+        # On appelle la fonction approprié.
+        self.computer.reset(self.code)
+        # Fin de callbackReset.
+        return
+
+    def callbackTick(self):
+        """
+            Donne un coup d'horloge au micro-ordinateur.
+
+            Cette fonction appelle la fonction appropriée dans le module
+            04-Micro-Ordinateur pour donner un coup d'horloge à la machine
+            virtuelle.
+
+
+        """
+        # On appelle la fonction approprié.
+        self.computer.tick()
+        # Fin de callbackTick.
+        return
+
+    def callbackClock(self):
+        """
+            Active/Désactive l'horloge du micro-ordinateur.
+
+            Cette fonction appelle la fonction appropriée dans le module
+            04-Micro-Ordinateur pour activer/désactiver l'horloge de la
+            machine virtuelle.
+
+
+        """
+        # On appelle la fonction approprié.
+        self.computer.toggleClock()
+        self.boolClock = not self.boolClock
+        if (self.boolClock):
+            self.txtvarToggleClock.set("Arrêter l'horloge")
+        else:
+            self.txtvarToggleClock.set("Démarrer l'horloge")
+        # Fin de callbackClock.
+        return
 
     def getListRAM(self):
         """
@@ -211,3 +267,5 @@ class VueOrdinateur(Frame):
 
         """
         self.txtvarConsoleOutput += output
+        # Fin de appendConsoleOutput.
+        return self

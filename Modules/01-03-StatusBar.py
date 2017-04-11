@@ -9,7 +9,7 @@
     Titre           : Widget : Barre de status
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 27-04-2017
+    Date            : 10-04-2017
     Description     : Un widget Tk qui représente une barre de statut.
 
 
@@ -23,9 +23,13 @@ __status__ = "Production"
 # Python 2 seulement:
 try:
     from Tkinter import *
+    from ttk import *
+    import tkFont
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
+    from tkinter.ttk import *
+    import tkFont
 
 """
     Le module ``StatusBar``
@@ -65,18 +69,28 @@ class StatusBar(Frame):
 
 
         """
+        # Initialistion du status bar.
         Frame.__init__(self, parent)
-        self.label = Label(self, bd=1, relief=SUNKEN, anchor=W)
-        self.label.pack(fill=X)
+        self.label = Label(
+            self,
+            borderwidth=1,
+            relief=GROOVE,
+            anchor=W,
+            background="#bfbfbf",
+            font=tkFont.Font(
+                size=12))
+        self.label.pack(fill=BOTH, expand=TRUE)
+        # Fin de __init__.
+        return
 
-    def set(self, format, *args):
+    def setText(self, format, *args):
         """
             Accesseur (setter) du texte de la StatusBar.
 
             Cette fonction établit un nouveau texte pour la StatusBar.
             Il est possible d'envoyer des arguments dans la fonction pour
             une personnalisation du texte plus avancée (se référer à
-            Label.confi() dans la documentation de Tkinter).
+            Label.config() dans la documentation de Tkinter).
 
             :param format: Nouveau texte de la StatusBar.
             :type format: str
@@ -86,8 +100,11 @@ class StatusBar(Frame):
 
 
         """
+        # Modification du text.
         self.label.config(text=format % args)
         self.label.update_idletasks()
+        # Fin de setText.
+        return self
 
     def clear(self):
         """
@@ -98,5 +115,8 @@ class StatusBar(Frame):
 
 
         """
+        # Effacement du text.
         self.label.config(text="")
         self.label.update_idletasks()
+        # Fin de clear.
+        return
