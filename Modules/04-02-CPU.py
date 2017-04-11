@@ -147,8 +147,7 @@ class cpu:
                 self.registres['5'][12]=0
         if self.c==12800:
             if self.registres[str(self.d)]> self.registres[self.b]:
-                self.registres['5'][12]=1
-                      
+                self.registres['5'][12]=1   
             else:
                 print("dans le else ")
                 self.registres['5'][12]=0
