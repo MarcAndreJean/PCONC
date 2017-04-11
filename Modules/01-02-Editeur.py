@@ -24,25 +24,28 @@ try:
     modFunctEditor = __import__("02-FonctionEditeur")
     modCompiler = __import__("03-Compileur")
     modStatusBar = __import__("01-03-StatusBar")
+    modCST = __import__("01-04-CodeScrolledText")
 except ImportError:
     import importlib
     modFunctEditor = importlib.import_module("Modules.02-FonctionEditeur")
     modCompiler = importlib.import_module("Modules.03-Compileur")
     modStatusBar = importlib.import_module("Modules.01-03-StatusBar")
+    modCST = importlib.import_module("Modules.01-04-CodeScrolledText")
 
 
 # Importation de Tkinter selon la version de Python.
 # Python 2 seulement:
 try:
     from Tkinter import *
-    from ttk import *
+    import ttk as ttk
+    from ttk import Frame
     import ScrolledText as tkst
     import tkFileDialog as fileDialog
     import tkMessageBox as messageBox
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
-    from tkinter.ttk import *
+    import tkinter.ttk as ttk
     import tkinter.scrolledtext as tkst
     import tkinter.filedialog as fileDialog
     import tkinter.messagebox as messageBox
@@ -100,23 +103,24 @@ class VueEditeur(Frame):
 
         # ----Text.
         self.frameCin = Frame(self.globalFrame)
-        self.labelCin = Label(self.frameCin,
-                              text="Code")
+        self.labelCin = ttk.Label(self.frameCin,
+                                  text="Code", anchor=SW)
 
         self.innerFrameCin = Frame(self.frameCin, relief=SUNKEN)
-        self.txtConsoleInput = tkst.ScrolledText(
-            self.innerFrameCin, width=0, relief=FLAT)
-        self.labelCin.pack(fill=X, padx=3, pady=5)
+        self.txtConsoleInput = modCST.CodeScrolledText(self.innerFrameCin)
+        self.txtConsoleInput.configure(width=0, relief=FLAT)
+        self.labelCin.pack(fill=X, padx=3, ipady=5)
         self.innerFrameCin.pack(fill=BOTH,
                                 padx=3, pady=5, expand=True)
         self.txtConsoleInput.pack(fill=BOTH, padx=3, pady=3, expand=True)
         self.frameCin.grid(column=0, row=0, sticky="NSWE")
         # ----Button.
         self.frameBut = Frame(self.globalFrame)
-        self.butCompile = Button(self.frameBut, text="Compiler et Sauvegarder")
-        self.butSave = Button(self.frameBut, text="Sauvegarder Code")
-        self.butLoad = Button(self.frameBut,
-                              text="Ouvrir Code")
+        self.butCompile = ttk.Button(
+            self.frameBut, text="Compiler et Sauvegarder")
+        self.butSave = ttk.Button(self.frameBut, text="Sauvegarder Code")
+        self.butLoad = ttk.Button(self.frameBut,
+                                  text="Ouvrir Code")
         self.butCompile.pack(fill=X, padx=20, pady=35, ipady=15)
         self.butSave.pack(fill=X, padx=20, pady=3, ipady=10)
         self.butLoad.pack(fill=X, padx=20, pady=3, ipady=10)
@@ -141,18 +145,18 @@ class VueEditeur(Frame):
 
     def callbackCompile(self):
         """
-                Fonction «callback» pour le bouton «Compiler».
+            Fonction «callback» pour le bouton «Compiler».
 
-                Cette fonction appelle la fonction appropriée du module
-        03-Compiler. Si la compilation est un échec, cette fonction
-        avertie l'utilisateur via une boite système l'erreur
-        (l'information est aussi inscrite sur la barre de statut).
-        Si la compilation est un succès, on ouvre une boite système
-        pour faire choisir l'emplacement où sauvegarder le fichier
-        compilé. Nous appelons ensuite la fonction pour sauvegarder
-        ce fichier.
+            Cette fonction appelle la fonction appropriée du module
+            03-Compiler. Si la compilation est un échec, cette fonction
+            avertie l'utilisateur via une boite système l'erreur
+            (l'information est aussi inscrite sur la barre de statut).
+            Si la compilation est un succès, on ouvre une boite système
+            pour faire choisir l'emplacement où sauvegarder le fichier
+            compilé. Nous appelons ensuite la fonction pour sauvegarder
+            ce fichier.
 
-        ..note: Cette fonction est interne à la classe.
+            ..note: Cette fonction est interne à la classe.
 
 
         """

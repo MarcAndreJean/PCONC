@@ -33,11 +33,11 @@ except ImportError:
 # Python 2 seulement:
 try:
     from Tkinter import *
-    from ttk import *
+    import ttk as ttk
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
-    from tkinter.ttk import *
+    import tkinter.ttk as ttk
 
 """
     Le module ``Vue``
@@ -90,7 +90,7 @@ class VueGlobal(Frame):
 
         # Crée la composante graphique qui va controler le gui Ordinateur
         # et Editeur avec un tabs.
-        self.vueTabs = Notebook(self)
+        self.vueTabs = ttk.Notebook(self)
 
         # Crée les deux sous-vues.
         self.vueOrdinateur = modOrdinateur.VueOrdinateur(self.vueTabs)

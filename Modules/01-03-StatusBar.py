@@ -23,12 +23,12 @@ __status__ = "Production"
 # Python 2 seulement:
 try:
     from Tkinter import *
-    from ttk import *
+    import ttk as ttk
     import tkFont
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
-    from tkinter.ttk import *
+    import tkinter.ttk as ttk
     import tkFont
 
 """

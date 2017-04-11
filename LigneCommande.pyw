@@ -3,14 +3,14 @@
 """
     Projet          : Editeur, Compilateur et Micro-Ordinateur pour
                       un langage assembleur.
-    Nom du fichier  : ProjetConception.py
+    Nom du fichier  : LigneCommande.py
 
-    Identification  : ProjetConception
-    Titre           : Programme principal du projet
+    Identification  : LigneCommande
+    Titre           : Programme «ligne de commande» du projet
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
     Date            : 27-04-2017
-    Description     : Démmarrage de l'application.
+    Description     : Démmarrage de l'application en interpréteur.
 
 
 """
@@ -20,22 +20,23 @@ __version__ = "1.0"
 __status__ = "Production"
 
 """
-    Le module ``ProjetConception``
+    Le module ``LigneCommande``
     ================================
 
-    Ce module s'occupe tout simplement de démarrer l'application et de
-    rassembler tous les modules. Les lignes de code ci-dessous s'occupent
-    de démarrer l'interface après que tous les modules soient chargés.
+    Ce module s'occupe de démarrer l'application en mode «ligne de
+    commande» et de rassembler tous les modules. Les lignes de code
+    ci-dessous s'occupent de démarrer l'interface après que tous les
+    modules soient chargés.
 
 
 """
 
 # Importation des modules nécessaires.
 try:
-    modVue = __import__("01-Vue")
+    modVue = __import__("01-01-Ordinateur")
 except ImportError:
     import importlib
-    modVue = importlib.import_module("Modules.01-Vue")
+    modVue = importlib.import_module("Modules.01-01-Ordinateur")
 
 
 # Importation de Tkinter selon la version de Python.
@@ -46,19 +47,19 @@ try:
 except ImportError:
     from tkinter import *
 
-# Si "ProjetConception.pyw" est lancé comme étant le programme principal
+# Si "LigneCommande.pyw" est lancé comme étant le programme principal
 # (donc non importé, mais exécuter), on crée l'application.
 if __name__ == '__main__':
     # Création de la fenêtre avec une taille initiale.
     root = Tk()
 
     # Création de la vue globale dans le root.
-    vueGlobal = modVue.VueGlobal(root)
+    vueGlobal = modVue.VueOrdinateur(root, modVue.TypeUse.LIGNECOMMANDE)
     vueGlobal.pack(fill=BOTH, expand=True)
 
     # Définition des paramètres pour le root.
     root.wm_minsize(800, 600)
-    root.wm_title("Projet Conception - v" + __version__)
+    root.wm_title("Projet Conception - Ligne de commande - v" + __version__)
 
     # Démarrage de l'application.
     root.mainloop()
