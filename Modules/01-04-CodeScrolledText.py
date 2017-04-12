@@ -209,13 +209,13 @@ class CodeScrolledText(Frame):
 
         # Liaison des fonctions ultérieurement écrites (voir plus haut
         # dans TextAdvanced) avec TextwLineNumbers.
-        self.editArea.bind("<<Change>>", self._on_change)
-        self.editArea.bind("<Configure>", self._on_change)
+        self.editArea.bind("<<Change>>", self.__onChange)
+        self.editArea.bind("<Configure>", self.__onChange)
 
         # Fin de __init__.
         return
 
-    def _on_change(self, event):
+    def __onChange(self, event):
         """
             Event pour la mise à jour des lignes.
 

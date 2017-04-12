@@ -136,14 +136,14 @@ class VueEditeur(Frame):
         self.statusBar.pack(fill=X)
 
         # Liaison des évènements.
-        self.butCompile.configure(command=self.callbackCompile)
-        self.butSave.configure(command=self.callbackSave)
-        self.butLoad.configure(command=self.callbackLoad)
+        self.butCompile.configure(command=self.__callbackCompile)
+        self.butSave.configure(command=self.__callbackSave)
+        self.butLoad.configure(command=self.__callbackLoad)
 
         # Fin de __init__.
         return
 
-    def callbackCompile(self):
+    def __callbackCompile(self):
         """
             Fonction «callback» pour le bouton «Compiler».
 
@@ -162,9 +162,9 @@ class VueEditeur(Frame):
         """
         # On compile le code inscrit dans le widget Text.
         result = modCompiler.compile(self.txtConsoleInput.get("1.0", END))
-        self.statusBar.setText("La compilation est un succès.")
         # Si la compilation est un succès.
         if result[0]:
+            self.statusBar.setText("La compilation est un succès.")
             # On demande le chemin du fichier à sauvegarder.
             info = fileDialog.asksaveasfilename(
                 defaultextension=".exeb",
@@ -175,17 +175,17 @@ class VueEditeur(Frame):
                 return
             # On sauvegarde ce fichier.
             modFunctEditor.saveCode(info, result[1])
-            self.statusBar.setText("L'exécutable a été sauvegardé.")
+            self.statusBar.setText("La compilation est un succès. L'exécutable a été sauvegardé.")
         # Si la compilation est un échec.
         else:
             # On informe l'utilisateur.
-            self.statusBar.setText("Erreur : " + result[1])
+            self.statusBar.setText(result[1])
             messageBox.showerror(title="Erreur de compilation",
                                  message=result[1])
         # Fin callbackCompile.
         return
 
-    def callbackSave(self):
+    def __callbackSave(self):
         """
             Fonction «callback» pour le bouton «Sauvegarder».
 
@@ -212,7 +212,7 @@ class VueEditeur(Frame):
         # Fin callbackSave.
         return
 
-    def callbackLoad(self):
+    def __callbackLoad(self):
         """
             Fonction «callback» pour le bouton «Charger».
 

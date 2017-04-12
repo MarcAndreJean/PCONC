@@ -53,7 +53,7 @@ except ImportError:
 """
 
 
-def enum(**enums):
+def __enum(**enums):
     """
         Création du type Enum pour le besoin de l'application.
 
@@ -67,7 +67,7 @@ def enum(**enums):
 # Enum des différents types d'utilisation de la Vue Ordinateur
 # NORMAL = Utilisation avec l'application.
 # LIGNECOMMANDE = Utilisation en ligne de commande.
-TypeUse = enum(NORMAL=1, LIGNECOMMANDE=2)
+TypeUse = __enum(NORMAL=1, LIGNECOMMANDE=2)
 
 
 class VueOrdinateur(Frame):
@@ -105,7 +105,6 @@ class VueOrdinateur(Frame):
         """
         # Crée un Micro-Ordinateur pour cette interface
         self.computer = modComputer.MicroOrdinateur()
-        self.code = ""
         self.boolClock = False
 
         # Initialise le Frame de l'instance.
@@ -218,17 +217,17 @@ class VueOrdinateur(Frame):
 
         # Liaison des évènements.
         if typeUse == TypeUse.NORMAL:
-            self.butCharger.configure(command=self.callbackCharger)
-            self.butReset.configure(command=self.callbackReset)
-            self.butTick.configure(command=self.callbackTick)
-            self.butClock.configure(command=self.callbackClock)
+            self.butCharger.configure(command=self.__callbackCharger)
+            self.butReset.configure(command=self.__callbackReset)
+            self.butTick.configure(command=self.__callbackTick)
+            self.butClock.configure(command=self.__callbackClock)
         else:
-            self.entryCMD.bind('<Return>', self.callbackCMD)
+            self.entryCMD.bind('<Return>', self.__callbackCMD)
 
         # Fin de __init__.
         return
 
-    def callbackCMD(self, event):
+    def __callbackCMD(self, event):
         # Compilation du code en bytecode.
         result = modCompiler.compile(self.entryCMD.get())
         # Si la compilation est un succès on l'exécute.
@@ -245,7 +244,7 @@ class VueOrdinateur(Frame):
             self.after(300, lambda: self.entryCMD.configure(foreground=fg))
         return
 
-    def callbackCharger(self):
+    def __callbackCharger(self):
         """
             Fonction «callback» pour le bouton «Charger».
 
@@ -268,11 +267,11 @@ class VueOrdinateur(Frame):
         code = modFunctEditor.loadCode(info)
         # On appelle la fonction approprié pour charger le code dans
         # le micro-ordinateur.
-        self.computer.reset(self.code)
+        self.computer.load(code)
         # Fin de callbackCharger.
         return
 
-    def callbackReset(self):
+    def __callbackReset(self):
         """
             Réinitialise le micro-ordinateur avec le précédent exécutable.
 
@@ -284,11 +283,11 @@ class VueOrdinateur(Frame):
 
         """
         # On appelle la fonction approprié.
-        self.computer.reset(self.code)
+        self.computer.reset()
         # Fin de callbackReset.
         return
 
-    def callbackTick(self):
+    def __callbackTick(self):
         """
             Donne un coup d'horloge au micro-ordinateur.
 
@@ -303,7 +302,7 @@ class VueOrdinateur(Frame):
         # Fin de callbackTick.
         return
 
-    def callbackClock(self):
+    def __callbackClock(self):
         """
             Active/Désactive l'horloge du micro-ordinateur.
 

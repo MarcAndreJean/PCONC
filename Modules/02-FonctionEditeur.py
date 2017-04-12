@@ -29,41 +29,47 @@ __status__ = "Production"
 
 """
 
-
 def saveCode(path, code):
     """
-            Titre
+        Titre
 
-            Descriptions
+        Descriptions
 
-            :example:
-            >>> saveCode("C:\Windows\test.asm", "mov 10 acc")
+        :example:
+        >>> saveCode("C:\Windows\test.asm", "mov 10 acc")
 
-            :param path:
-            :type path: str
-            :param code:
-            :type code: str
+        :param path:
+        :type path: str
+        :param code:
+        :type code: str
 
-
+        
     """
+    fichier = open(path,"w")
+    fichier.write(code)
+    fichier.close()
+
 
 
 def loadCode(path):
     """
-            Titre
+        Titre
 
-            Descriptions
+        Descriptions
 
-            :example:
-            >>> saveCode("C:\Windows\test.asm")
-            "mov 10 acc"
+        :example:
+        >>> saveCode("C:\Windows\test.asm")
+        "mov 10 acc"
 
-            :param path:
-            :type path: str
-            :return:
-            :rtype: str
+        :param path:
+        :type path: str
+        :return:
+        :rtype: str
 
-
+        
 
     """
+    fichier = open(path,"r")
+    code = fichier.read()
+    fichier.close()
     return code
