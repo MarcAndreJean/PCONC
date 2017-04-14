@@ -18,7 +18,7 @@
 
     Ce module contient la fonction compile(str) pour compiler le langage
     assembleur donné en argument. Les informations sur la syntaxe et les
-    mots-clés du langage assembleur sont disponibles dans le manuel et 
+    mots-clés du langage assembleur sont disponibles dans le manuel et
     dans le document de spécification. La fonction compile() utilise
     la fonction interne du module __compileEx(str, str) qui compile une
     simple ligne de code. Le module utilise plusieurs énumérations et
@@ -31,6 +31,7 @@
 __author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
+
 
 def __enum(**enums):
     """
@@ -47,6 +48,7 @@ def __enum(**enums):
 
     """
     return type('Enum', (), enums)
+
 
 # Enumération pour les opérateurs.
 OPCODE = __enum(NOP=0x0000,
@@ -83,9 +85,10 @@ OPCODE = __enum(NOP=0x0000,
 REGISTRE = __enum(A=0x0001, B=0x0002, C=0x0003, D=0x0004)
 
 # Enumeration pour le type d'adressage.
-ADRESSAGE = __enum(IMMEDIATE=0x0000, # Valeur écrite dans le code
-                   DIRECT=0x0010, # Adresse écrite dans le code
-                   INDIRECT=0x0020) # Adresse dans le registre
+ADRESSAGE = __enum(IMMEDIATE=0x0000,  # Valeur écrite dans le code
+                   DIRECT=0x0010,  # Adresse écrite dans le code
+                   INDIRECT=0x0020)  # Adresse dans le registre
+
 
 def compile(code):
     """
@@ -96,7 +99,7 @@ def compile(code):
         code assembleur.
 
         :example:
-        >>> expect = [True, 
+        >>> expect = [True,
         ...           [OPCODE.SET | REGISTRE.A | ADRESSAGE.IMMEDIATE,
         ...           83,
         ...           OPCODE.ST | REGISTRE.A | ADRESSAGE.DIRECT,
@@ -117,7 +120,7 @@ def compile(code):
 
     """
     bytecode = []
-    dictComment = {';' : True, '#' : True}
+    dictComment = {';': True, '#': True}
     # On parcourt le texte ligne par ligne.
     linenum = 1
     for line in iter(code.splitlines()):
@@ -126,59 +129,71 @@ def compile(code):
         # Si nous avons aucun mot OU que nous avons plus qu'un mot et
         # que le premier est un commentaire: nous ignorons la ligne.
         if len(words) == 0 \
-        or (len(words) >= 1 and dictComment.get(words[0][0], False)):
+                or (len(words) >= 1 and dictComment.get(words[0][0], False)):
             continue
         # Si nous avons un mot et que celui-ci n'est pas un commentaire,
         # OU que nous avons plus que deux mots et que le deuxième est
         # un commentaire: nous essayons de compiler le potentiel opcode
         # (en ignorant le reste de la phrase si commentaire).
         elif (len(words) == 1 and not dictComment.get(words[0][0], False)) \
-        or (len(words) >= 2 and dictComment.get(words[1][0], False)):
+                or (len(words) >= 2 and dictComment.get(words[1][0], False)):
             opcode = words[0]
-            val = ""
-        # Si nous avons deux mot et que le deuxième n'est pas un 
+            valg = ''
+            vald = ''
+        # Si nous avons deux mot et que le deuxième n'est pas un
         # commentaire, OU que nous avons plus que trois mots et que
         # le troisième est un commentaire: nous essayons de compiler le
         # potentiel opcode et le potentiel argument (en ignorant le reste
         # de la phrase si commentaire).
         elif (len(words) == 2 and not dictComment.get(words[1][0], False)) \
-        or (len(words) >= 3 and dictComment.get(words[2][0], False)):
+                or (len(words) >= 3 and dictComment.get(words[2][0], False)):
             opcode = words[0]
-            val = words[1]
+            valg = words[1]
+            vald = ''
+        # Si nous avons deux mot et que le deuxième n'est pas un
+        # commentaire, OU que nous avons plus que trois mots et que
+        # le troisième est un commentaire: nous essayons de compiler le
+        # potentiel opcode et le potentiel argument (en ignorant le reste
+        # de la phrase si commentaire).
+        elif (len(words) == 3 and not dictComment.get(words[2][0], False)) \
+                or (len(words) >= 4 and dictComment.get(words[3][0], False)):
+            opcode = words[0]
+            valg = words[1]
+            vald = words[2]
         # Sinon, il s'agit d'une ligne illégale.
         else:
-            [False, "Ligne " + str(linenum) + " : ligne illégale."] 
-        
+            [False, "Ligne " + str(linenum) + " : ligne illégale."]
+
         # On essaie de compiler la ligne.
         try:
-            result = __compileEx(opcode, val)
+            result = __compileEx(opcode, valg, vald)
             bytecode.append(result[0])
             bytecode.append(result[1])
         # On gère les exceptions
         except IndexError:
-            return [False, "Ligne " + str(linenum) + 
+            return [False, "Ligne " + str(linenum) +
                     " : OPCODE/ARG incorrect."]
         except ValueError:
-            return [False, "Ligne " + str(linenum) + 
+            return [False, "Ligne " + str(linenum) +
                     " : ARG incorrect. Impossible de convertir" +
                     " l'argument en nombre."]
         except CompilationErreur as e:
             if e.value == "INVALID OPCODE":
-                return [False, "Ligne " + str(linenum) + 
+                return [False, "Ligne " + str(linenum) +
                         " : OPCODE invalide."]
             elif e.value == "INVALID OPCODE-REG":
-                return [False, "Ligne " + str(linenum) + 
+                return [False, "Ligne " + str(linenum) +
                         " : L'option registre de l'OPCODE est invalide."]
             elif e.value == "INVALID RIGHT REG":
-                return [False, "Ligne " + str(linenum) + 
+                return [False, "Ligne " + str(linenum) +
                         " : Le registre dans l'argument de droite est " +
                         "invalide."]
             elif e.value == "INVALID RIGHT ADDRESS":
-                return [False, "Ligne " + str(linenum) + 
+                return [False, "Ligne " + str(linenum) +
                         " : L'adresse dans l'argument de droite est " +
                         "invalide."]
             elif e.value == "INVALID RIGHT ARG":
-                return [False, "Ligne " + str(linenum) + 
+                return [False, "Ligne " + str(linenum) +
                         " : L'argument de droite est invalide."]
         linenum += 1
         if linenum > 0xFFFF:
@@ -187,7 +202,7 @@ def compile(code):
     return [True, bytecode]
 
 
-def __compileEx(opcode, val):
+def __compileEx(opcode, valg='', vald=''):
     """
         Fonction interne pour la fonction compile() du module.
 
@@ -196,120 +211,13 @@ def __compileEx(opcode, val):
         la commande et 8 bits pour le registre).
 
 
-        :example:
-        >>> # NOP & HLT
-        >>> [OPCODE.NOP, 0x0000] == __compileEx('NOP', '')
-        True
-        >>> [OPCODE.HLT, 0x0000] == __compileEx('HLT', '')
-        True
-
-
-        :example:
-        >>> # JUMPERS
-        >>> [OPCODE.JMP | ADRESSAGE.DIRECT, 0x9999] \
-            == __compileEx('JMP', '0x9999')
-        True
-        >>> [OPCODE.JMZ | ADRESSAGE.DIRECT, 0x8888] \
-            == __compileEx('JMZ', '0x8888')
-        True
-        >>> [OPCODE.JMO | ADRESSAGE.DIRECT, 0x7777] \
-            == __compileEx('JMO', '0x7777')
-        True
-        >>> [OPCODE.JMC | ADRESSAGE.DIRECT, 0x6666] \
-            == __compileEx('JMC', '0x6666')
-        True
-
-
-        :example:
-        >>> # SET & MOVERS
-        >>> [OPCODE.SET | REGISTRE.A | ADRESSAGE.IMMEDIATE , ord('A')] \
-            == __compileEx('SETA', "\'A\'")
-        True
-        >>> [OPCODE.LD | REGISTRE.B | ADRESSAGE.DIRECT, 0x5555] \
-            == __compileEx('LDB', '0x5555')
-        True
-        >>> [OPCODE.LD | REGISTRE.B, REGISTRE.C] \
-            == __compileEx('LDB', 'C')
-        True
-        >>> [OPCODE.ST | REGISTRE.C | ADRESSAGE.DIRECT, 0x3333] \
-            == __compileEx('STC', '0x3333')
-        True
-        >>> [OPCODE.ST | REGISTRE.C, REGISTRE.C] \
-            == __compileEx('STC', 'C')
-        True
-        >>> [OPCODE.ST | REGISTRE.D, REGISTRE.A] \
-            == __compileEx('STD', 'A')
-        True
-
-
-        :example:
-        >>> # ALU SPECIFIC
-        >>> [OPCODE.ADD | REGISTRE.A, REGISTRE.B] \
-            == __compileEx('ADDA', 'B')
-        True
-        >>> [OPCODE.SUB | REGISTRE.B, REGISTRE.C] \
-            == __compileEx('SUBB', 'C')
-        True
-        >>> [OPCODE.MUL | REGISTRE.C, REGISTRE.D] \
-            == __compileEx('MULC', 'D')
-        True
-        >>> [OPCODE.DIV | REGISTRE.D, REGISTRE.A] \
-            == __compileEx('DIVD', 'A')
-        True
-
-
-        :example:
-        >>> # BITWISE
-        >>> [OPCODE.OR | REGISTRE.A, REGISTRE.B] \
-            == __compileEx('ORA', 'B')
-        True
-        >>> [OPCODE.AND | REGISTRE.B, REGISTRE.C] \
-            == __compileEx('ANDB', 'C')
-        True
-        >>> [OPCODE.XOR | REGISTRE.C, REGISTRE.D] \
-            == __compileEx('XORC', 'D')
-        True
-        >>> [OPCODE.NOT | REGISTRE.D, 0x0000] \
-            == __compileEx('NOTD', '')
-        True
-
-
-        :example:
-        >>> # COMPARATORS
-        >>> [OPCODE.LT | REGISTRE.A, REGISTRE.B] \
-            == __compileEx('LTA', 'B')
-        True
-        >>> [OPCODE.GT | REGISTRE.B, REGISTRE.C] \
-            == __compileEx('GTB', 'C')
-        True
-        >>> [OPCODE.LE | REGISTRE.C, REGISTRE.D] \
-            == __compileEx('LEC', 'D')
-        True
-        >>> [OPCODE.GE | REGISTRE.D, REGISTRE.A] \
-            == __compileEx('GED', 'A')
-        True
-        >>> [OPCODE.EQ | REGISTRE.A, REGISTRE.B] \
-            == __compileEx('EQA', 'B')
-        True
-        >>> [OPCODE.EZ | REGISTRE.B, 0x0000] \
-            == __compileEx('EZB', '')
-        True
-        >>> [OPCODE.NZ | REGISTRE.C, 0x0000] \
-            == __compileEx('NZC', '')
-        True
-
-
-        :example:
-        >>> # DTA
-        >>> [OPCODE.DTA, ord("Z")] \
-            == __compileEx('DTA', "\'Z\'")
-        True
-
-
         :param opcode: Partie de gauche d'une ligne de code assembleur.
         :type opcode: str
-        :param val: Partie de droite d'une ligne de code assembleur.
-        :type val: str
+        :param valg: Partie du complémentaire de gauche ou central d'une
+                     ligne de code assembleur.
+        :type valg: str
+        :param vald: Partie de droite d'une ligne de code assembleur.
+        :type vald: str
 
         :return: Retourne un tableau de deux cases. La case [0]
                  représente les 16 bits de gauche et la case [1]
@@ -331,45 +239,47 @@ def __compileEx(opcode, val):
     _16bitsLeft = 0x0000
     _16bitsRight = 0x0000
     # Dictionnaire utilisé plus qu'une fois :
-    dictREG = {'A' : REGISTRE.A, 'B' : REGISTRE.B,
-               'C' : REGISTRE.C, 'D' : REGISTRE.D}
+    dictREG = {'A': REGISTRE.A, 'a': REGISTRE.A,
+               'B': REGISTRE.B, 'b': REGISTRE.B,
+               'C': REGISTRE.C, 'c': REGISTRE.C,
+               'D': REGISTRE.D, 'd': REGISTRE.D}
 
     # 16 Bits de gauche (OPCODE[REG]) de format OO[O][R]
     # ==========================================================
     # On vérifie si le bytecode est dans le premier dictionnaire
     # (2 caractères)
     _16bitsLeft = {
-        'LD' : OPCODE.LD,
-        'ST' : OPCODE.ST,
-        'MV' : OPCODE.MV,
-        'OR' : OPCODE.OR,
-        'LT' : OPCODE.LT,
-        'GT' : OPCODE.GT,
-        'LE' : OPCODE.LE,
-        'GE' : OPCODE.GE,
-        'EQ' : OPCODE.EQ,
-        'EZ' : OPCODE.EZ,
-        'NZ' : OPCODE.NZ,
+        'LD': OPCODE.LD,
+        'ST': OPCODE.ST,
+        'MV': OPCODE.MV,
+        'OR': OPCODE.OR,
+        'LT': OPCODE.LT,
+        'GT': OPCODE.GT,
+        'LE': OPCODE.LE,
+        'GE': OPCODE.GE,
+        'EQ': OPCODE.EQ,
+        'EZ': OPCODE.EZ,
+        'NZ': OPCODE.NZ,
     }.get(opcode[0:2], None)
     # Sinon on vérifie si le bytecode est dans le deuxième
     # dictionnaire (3 caractères)
     if _16bitsLeft is None:
         _16bitsLeft = {
-        'NOP' : OPCODE.NOP,
-        'JMP' : OPCODE.JMP,
-        'JMZ' : OPCODE.JMZ,
-        'JMO' : OPCODE.JMO,
-        'JMC' : OPCODE.JMC,
-        'SET' : OPCODE.SET,
-        'HLT' : OPCODE.HLT,
-        'ADD' : OPCODE.ADD,
-        'SUB' : OPCODE.SUB,
-        'MUL' : OPCODE.MUL,
-        'DIV' : OPCODE.DIV,
-        'AND' : OPCODE.AND,
-        'XOR' : OPCODE.XOR,
-        'NOT' : OPCODE.NOT,
-        'DTA' : OPCODE.DTA
+            'NOP': OPCODE.NOP,
+            'JMP': OPCODE.JMP,
+            'JMZ': OPCODE.JMZ,
+            'JMO': OPCODE.JMO,
+            'JMC': OPCODE.JMC,
+            'SET': OPCODE.SET,
+            'HLT': OPCODE.HLT,
+            'ADD': OPCODE.ADD,
+            'SUB': OPCODE.SUB,
+            'MUL': OPCODE.MUL,
+            'DIV': OPCODE.DIV,
+            'AND': OPCODE.AND,
+            'XOR': OPCODE.XOR,
+            'NOT': OPCODE.NOT,
+            'DTA': OPCODE.DTA
         }.get(opcode[0:3], None)
         # Si aucun OPCODE n'a été trouvé, on lance une exception.
         if _16bitsLeft is None:
@@ -377,74 +287,87 @@ def __compileEx(opcode, val):
         # Sinon on note la longueur de l'OPCODE (pour trouver
         # la valeur du registre)
         else:
-            indexReg=3
+            indexReg = 3
     else:
-        indexReg=2
+        indexReg = 2
 
     # On garde en mémoire le OPCODE
     _16bitsOPCODE = _16bitsLeft
 
     # Maintenant on vérifie le registre (gauche) pour les OPCODES
     # concernées :
-    if {OPCODE.JMC : False, OPCODE.JMZ : False,
-        OPCODE.JMO : False, OPCODE.JMC : False,
-        OPCODE.NOP : False, OPCODE.HLT : False,
-        OPCODE.DTA : False, OPCODE.JMP : False}.get(_16bitsOPCODE, True):
+    if {OPCODE.JMC: False, OPCODE.JMZ: False,
+        OPCODE.JMO: False, OPCODE.JMC: False,
+        OPCODE.NOP: False, OPCODE.HLT: False,
+            OPCODE.DTA: False, OPCODE.JMP: False}.get(_16bitsOPCODE, True):
         # On cherche dans le dictionnaire si la valeur est présente:
-        reg = dictREG.get(opcode[indexReg], None)
+        try:
+            reg = dictREG.get(opcode[indexReg], None)
+            vald = valg
+            indexReg += 1
+        except IndexError:
+            if valg is "":
+                raise IndexError()
+            reg = dictREG.get(valg, None)
+            # On teste si le REGISTRE est valide en terme de longueur
+            if len(valg) > 1:
+                raise CompilationErreur("INVALID OPCODE-REG")
         # Si oui, on ajoute (avec OR bitwise) dans la valeur du
         # bytecode gauche. Sinon on lance une exception.
         if reg is None:
             raise CompilationErreur("INVALID OPCODE-REG")
         else:
             _16bitsLeft |= reg
-        indexReg += 1
+    else:
+        if vald is not "":
+            raise CompilationErreur("INVALID RIGHT VALUE")
+        vald = valg
 
     # On teste si le OPCODE est valide en terme de longueur
     if len(opcode) > indexReg:
         raise CompilationErreur("INVALID OPCODE")
-    
+
     # 16 Bits de droite ([REG || VALUE || ADDRESS]) de format [R || V || A]
     # ==========================================================
     # Si l'OPCODE a une valeur de registre [A:D] dans les bits droits
-    if {OPCODE.MV : True, OPCODE.ADD : True,
-        OPCODE.SUB : True, OPCODE.MUL : True,
-        OPCODE.DIV : True, OPCODE.OR : True,
-        OPCODE.AND : True, OPCODE.XOR : True,
-        OPCODE.LT : True, OPCODE.GT : True,
-        OPCODE.LE : True, OPCODE.GE : True,
-        OPCODE.EQ : True, }.get(_16bitsOPCODE, False):
+    if {OPCODE.MV: True, OPCODE.ADD: True,
+        OPCODE.SUB: True, OPCODE.MUL: True,
+        OPCODE.DIV: True, OPCODE.OR: True,
+        OPCODE.AND: True, OPCODE.XOR: True,
+        OPCODE.LT: True, OPCODE.GT: True,
+        OPCODE.LE: True, OPCODE.GE: True,
+            OPCODE.EQ: True, }.get(_16bitsOPCODE, False):
         # Donnez la valeur de ce registre
-        _16bitsRight = dictREG.get(val, None)
+        _16bitsRight = dictREG.get(vald, None)
         if _16bitsRight is None:
             raise CompilationErreur("INVALID RIGHT REG")
     # Si l'OPCODE a une valeur dans les bits droits
     elif OPCODE.SET == _16bitsOPCODE:
-        _16bitsRight = stringToInt(val)
+        _16bitsRight = stringToInt(vald)
         if _16bitsRight > 0xFFFF:
             raise CompilationErreur("INVALID RIGHT VALUE")
         # Ajoute le mode d'adressage en mode « Argument est une registre ».
         _16bitsLeft |= ADRESSAGE.IMMEDIATE
     # Si l'OPCODE a une adresse* dans les bits droits
-    elif {OPCODE.LD : True, OPCODE.ST : True}.get(_16bitsOPCODE, False):
-        _16bitsRight = dictREG.get(val, None)
+    elif {OPCODE.LD: True, OPCODE.ST: True}.get(_16bitsOPCODE, False):
+        _16bitsRight = dictREG.get(vald, None)
         if _16bitsRight is None:
-            _16bitsRight = stringToInt(val)
+            _16bitsRight = stringToInt(vald)
             if _16bitsRight > 0xFFFF:
                 raise CompilationErreur("INVALID RIGHT ARG")
             # Mode d'adressage en mode « Argument est une ADRESSE ».
             _16bitsLeft |= ADRESSAGE.DIRECT
     # Si l'OPCODE a une adresse dans les bits droits
-    elif {OPCODE.JMP : True, OPCODE.JMZ : True,
-          OPCODE.JMO : True, OPCODE.JMC : True,
+    elif {OPCODE.JMP: True, OPCODE.JMZ: True,
+          OPCODE.JMO: True, OPCODE.JMC: True,
           }.get(_16bitsOPCODE, False):
-        _16bitsRight = stringToInt(val)
+        _16bitsRight = stringToInt(vald)
         if _16bitsRight > 0xFFFF:
             raise CompilationErreur("INVALID RIGHT ADDRESS")
         # Ajoute le mode d'adressage en mode « Argument est une ADRESSE ».
         _16bitsLeft |= ADRESSAGE.DIRECT
     elif OPCODE.DTA == _16bitsOPCODE:
-        _16bitsRight = stringToInt(val)
+        _16bitsRight = stringToInt(vald)
 
     # On retourne nos deux 16 bits de données.
     return [_16bitsLeft, _16bitsRight]
@@ -479,20 +402,20 @@ def stringToInt(val):
     if len(val) == 3 and val[0] == '\'' and val[2] == '\'':
         return ord(val[1])
     # Sinon, conversion String/Décimal vers int. Eg.: 10
-    try :
-        return int(val) # Décimal
+    try:
+        return int(val)  # Décimal
     except ValueError:
         # Sinon, conversion String/Binaire vers int. Eg.: 0b0101
-        try :
-            return int(val, 2) # Binaire
+        try:
+            return int(val, 2)  # Binaire
         except ValueError:
             # Sinon, conversion String/Octal vers int. Eg.: 0o76
-            try :
-                return int(val, 8) # Octal
+            try:
+                return int(val, 8)  # Octal
             except ValueError:
-            # Sinon, conversion String/Hex vers int. Eg.: 0xA6
-                return int(val, 16) # Hex
-            
+                # Sinon, conversion String/Hex vers int. Eg.: 0xA6
+                return int(val, 16)  # Hex
+
 
 class CompilationErreur(Exception):
     """
@@ -500,7 +423,7 @@ class CompilationErreur(Exception):
 
         Il s'agit simplement d'un classe qui hérite de la classe
         Exception de base de Python. Elle sera utilisée lors d'une
-        exception lors de la compilation ligne par ligne 
+        exception lors de la compilation ligne par ligne
         (voir __compileEx).
 
         :example:
@@ -512,6 +435,7 @@ class CompilationErreur(Exception):
 
 
     """
+
     def __init__(self, value):
         """
             Constructeur de l'exception.
@@ -526,4 +450,5 @@ class CompilationErreur(Exception):
 # Activation des doctest
 if __name__ == "__main__":
     import doctest
+    doctest.testfile("doctest-03-Compileur.txt")
     doctest.testmod()

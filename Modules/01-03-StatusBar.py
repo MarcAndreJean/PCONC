@@ -130,6 +130,7 @@ class StatusBar(Frame):
         # Fin de clear.
         return
 
+
 # Activation des doctest
 if __name__ == "__main__":
     import doctest

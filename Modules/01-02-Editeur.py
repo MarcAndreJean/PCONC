@@ -179,8 +179,9 @@ class VueEditeur(Frame):
             if info is "":
                 return
             # On sauvegarde ce fichier.
-            modFunctEditor.saveCode(info, result[1])
-            self.statusBar.setText("La compilation est un succès. L'exécutable a été sauvegardé.")
+            modFunctEditor.saveByteCode(info, result[1])
+            self.statusBar.setText(
+                "La compilation est un succès. L'exécutable a été sauvegardé.")
         # Si la compilation est un échec.
         else:
             # On informe l'utilisateur.
@@ -212,7 +213,10 @@ class VueEditeur(Frame):
         if info is "":
             return
         # On sauvegarde ce fichier.
-        modFunctEditor.saveCode(info, self.txtConsoleInput.get("1.0", END))
+        modFunctEditor.saveTextCode(
+            info, self.txtConsoleInput.get(
+                "1.0", END)[
+                0:-1])
         self.statusBar.setText("Code sauvegarder.")
         # Fin callbackSave.
         return
@@ -238,11 +242,12 @@ class VueEditeur(Frame):
         if info is "":
             return
         # On charge ce fichier.
-        code = modFunctEditor.loadCode(info)
-        self.txtConsoleInput.delete(1.0, "END")
-        self.txtConsoleInput.insert("END", code)
+        code = modFunctEditor.loadTextCode(info)
+        self.txtConsoleInput.delete("1.0", END)
+        self.txtConsoleInput.insert(END, code)
         # Fin callbackLoad.
         return
+
 
 # Activation des doctest
 if __name__ == "__main__":

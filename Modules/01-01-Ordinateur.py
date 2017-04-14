@@ -292,7 +292,7 @@ class VueOrdinateur(Frame):
         if info is "":
             return
         # On charge ce fichier.
-        code = modFunctEditor.loadCode(info)
+        code = modFunctEditor.loadByteCode(info)
         # On appelle la fonction approprié pour charger le code dans
         # le micro-ordinateur.
         self.computer.load(code)
@@ -413,7 +413,8 @@ class VueOrdinateur(Frame):
 
 
         """
-        self.txtvarConsoleOutput.set(self.txtvarConsoleOutput.get() + '\n' + output)
+        self.txtvarConsoleOutput.set(
+            self.txtvarConsoleOutput.get() + '\n' + output)
         # Fin de appendConsoleOutput.
         return
 

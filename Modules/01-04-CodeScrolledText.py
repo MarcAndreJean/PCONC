@@ -46,6 +46,7 @@ except ImportError:
     from tkinter import *
     import tkinter.ttk as ttk
 
+
 class TextwLineNumbers(Canvas):
     """
         Classe qui hérite de Canvas. Cette classe est utilisé pour
@@ -59,6 +60,7 @@ class TextwLineNumbers(Canvas):
         >>> test.redraw()
 
     """
+
     def __init__(self, *args, **kwargs):
         """
             Constructeur de TextwLineNumbers.
@@ -123,7 +125,7 @@ class TextwLineNumbers(Canvas):
             i = self.textWidget.index("@0,0")
         except AttributeError:
             raise AttributeError("Vous devez appeler attach() avant "
-                                "d'appeler redraw().")
+                                 "d'appeler redraw().")
         # Pour toutes les lignes existantes nous redéfinisons:
         while True:
             dline = self.textWidget.dlineinfo(i)
@@ -135,9 +137,10 @@ class TextwLineNumbers(Canvas):
             if y > 16635:
                 break
             # On érit le format en Hex (4 bytes) et on l'imprime
-            linetext = format(int(str(i*2).split(".")[0])-1, '#06x')
+            linetext = format((int(str(i).split(".")[0]) - 1) * 2, '#06x')
             self.create_text(2, y, anchor="nw", text=linetext)
             i = self.textWidget.index("%s+1line" % i)
+
 
 class TextAdvanced(Text):
     """
@@ -149,6 +152,7 @@ class TextAdvanced(Text):
         >>> test = TextAdvanced()
 
     """
+
     def __init__(self, *args, **kwargs):
         """
             Constructeur de TextAdvanced.
@@ -194,6 +198,7 @@ class TextAdvanced(Text):
         '''.format(widget=str(self)))
         return
 
+
 class CodeScrolledText(Frame):
     """
         class CodeScrolledText
@@ -206,6 +211,7 @@ class CodeScrolledText(Frame):
         >>> test = CodeScrolledText(None)
 
     """
+
     def __init__(self, parent):
         """
             Constructeur de CodeScrolledText.
@@ -284,6 +290,45 @@ class CodeScrolledText(Frame):
 
         """
         return self.editArea.get(start, stop)
+
+    def delete(self, start, stop):
+        """
+            Wrapper pour la fonction delete du TextAdvanced.
+
+            Cette fonction est un wrapper pour la fonction delete()
+            du TextAdvanced.
+
+            :example:
+            >>> test = CodeScrolledText(None)
+            >>> test.delete('0.0', END)
+
+            :param start: Position début du texte à supprimer.
+            :type start: str
+            :param stop: Position fin du texte à supprimer.
+            :type stop: Indexes
+
+        """
+        return self.editArea.delete(start, stop)
+
+    def insert(self, start, texte):
+        """
+            Wrapper pour la fonction insert du TextAdvanced.
+
+            Cette fonction est un wrapper pour la fonction insert()
+            du TextAdvanced.
+
+            :example:
+            >>> test = CodeScrolledText(None)
+            >>> test.insert('0.0', "test")
+
+            :param start: Position début du texte où insérer.
+            :type start: str
+            :param texte: Texte à insérer.
+            :type texte: str
+
+        """
+        return self.editArea.insert(start, texte)
+
 
 # Activation des doctest
 if __name__ == "__main__":
