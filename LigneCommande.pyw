@@ -9,17 +9,10 @@
     Titre           : Programme «ligne de commande» du projet
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 27-04-2017
+    Date            : 13-04-2017
     Description     : Démmarrage de l'application en interpréteur.
 
 
-"""
-
-__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
-__version__ = "1.0"
-__status__ = "Production"
-
-"""
     Le module ``LigneCommande``
     ================================
 
@@ -30,6 +23,10 @@ __status__ = "Production"
 
 
 """
+
+__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
+__version__ = "1.0"
+__status__ = "Production"
 
 # Importation des modules nécessaires.
 try:

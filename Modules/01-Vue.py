@@ -9,8 +9,16 @@
     Titre           : GUI principal
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
+    Date            : 13-04-2017
     Description     : GUI principal de l'application.
+
+
+    Le module ``Vue``
+    ================================
+
+    Ce module s'occupe de l'affichage de la vue global de l'application
+    avec la librairie Tkinter de Python. Elle contient une classe VueGlobal
+    qui s'occupe des deux sous-vues (Ordinateur et Editeur).
 
 
 """
@@ -39,16 +47,6 @@ except ImportError:
     from tkinter import *
     import tkinter.ttk as ttk
 
-"""
-    Le module ``Vue``
-    ================================
-
-    Ce module s'occupe de l'affichage de la vue global de l'application
-    avec la librairie Tkinter de Python. Elle contient une classe VueGlobal
-    qui s'occupe des deux sous-vues (Ordinateur et Editeur).
-
-"""
-
 
 class VueGlobal(Frame):
     """
@@ -61,6 +59,10 @@ class VueGlobal(Frame):
         deux vues principales du programme : la vue « Ordinateur » et la
         vue « Editeur ». Pour d'amples informations, se référer au document
         de spécifications avec le croquis des interfaces.
+
+        :example:
+        >>> test = VueGlobal(None)
+        >>> test = VueGlobal(Tk())
 
 
     """
@@ -75,6 +77,10 @@ class VueGlobal(Frame):
             (Widget Notebook) et l'ajoute dans le Frame. Il initialise
             ensuite les deux sous-vues et les ajoute dans le gestionnaire
             d'onglet.
+
+            :example:
+            >>> test = VueGlobal(None)
+            >>> test = VueGlobal(Tk())
 
             :param parent: Widget Parent de la classe.
             :type parent: Widget (Tk)
@@ -105,6 +111,10 @@ class VueGlobal(Frame):
         # Ajoute les deux sous-vues dans le gestionnaire d'onglet.
         self.vueTabs.add(self.vueOrdinateur, text="Ordinateur")
         self.vueTabs.add(self.vueEditeur, text="Editeur")
-
         # Fin de __init__.
         return
+
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

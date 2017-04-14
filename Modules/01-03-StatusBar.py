@@ -6,11 +6,19 @@
     Nom du fichier  : 01-03-StatusBar.py
 
     Identification  : 01-03-StatusBar
-    Titre           : Widget : Barre de status
+    Titre           : Widget : Barre de statut
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
+    Date            : 13-04-2017
     Description     : Un widget Tk qui représente une barre de statut.
+
+
+    Le module ``StatusBar``
+    ================================
+
+    Ce module contient une classe nommée « StatusBar » qui est une barre de
+    statut comme dans les programmes populaires courants. Il s'agit d'un
+    Widget qui n'existe pas dans la bibliothèque de Tkinter (Python).
 
 
 """
@@ -30,17 +38,6 @@ except ImportError:
     from tkinter import *
     import tkinter.ttk as ttk
     import tkFont
-
-"""
-    Le module ``StatusBar``
-    ================================
-
-    Ce module contient une classe nommée « StatusBar » qui est une barre de
-    statut comme dans les programmes populaires courants. Il s'agit d'un
-    Widget qui n'existe pas dans la bibliothèque de Tkinter (Python).
-
-
-"""
 
 
 class StatusBar(Frame):
@@ -63,6 +60,10 @@ class StatusBar(Frame):
             Le constructeur initialise son Frame avec le parent qui est
             donné en argument. Il initialise un Label et l'ajoute dans le
             Frame.
+
+            :example:
+            >>> test1 = StatusBar(None)
+            >>> test2 = StatusBar(Tk())
 
             :param parent: Widget Parent de la classe.
             :type parent: Widget (Tk)
@@ -92,6 +93,11 @@ class StatusBar(Frame):
             une personnalisation du texte plus avancée (se référer à
             Label.config() dans la documentation de Tkinter).
 
+            :example:
+            >>> test = StatusBar(None)
+            >>> test.setText("test")
+            >>> test.setText("test")
+
             :param format: Nouveau texte de la StatusBar.
             :type format: str
 
@@ -113,6 +119,9 @@ class StatusBar(Frame):
             Cette fonction efface le texte de la StatusBar. Cela résultera
             en une StatusBar vide.
 
+            :example:
+            >>> test = StatusBar(None)
+            >>> test.clear()
 
         """
         # Effacement du text.
@@ -120,3 +129,8 @@ class StatusBar(Frame):
         self.label.update_idletasks()
         # Fin de clear.
         return
+
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

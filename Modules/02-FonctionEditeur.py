@@ -9,8 +9,14 @@
     Titre           : Interface Ordinateur
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
+    Date            : 13-04-2017
     Description     : Interface ordinateur de l'application.
+
+
+    Le module ``FonctionEditeur``
+    ================================
+
+    Ce module contient ...
 
 
 """
@@ -19,15 +25,6 @@ __author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
 
-
-"""
-    Le module ``FonctionEditeur``
-    ================================
-
-    Ce module contient ...
-
-
-"""
 
 def saveCode(path, code):
     """

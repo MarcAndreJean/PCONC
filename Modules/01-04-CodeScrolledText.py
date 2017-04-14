@@ -9,27 +9,10 @@
     Titre           : Widget : Texte avec défilement et numéro de ligne
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
+    Date            : 13-04-2017
     Description     : Un widget Tk qui représente une ScrolledText avancé.
 
 
-"""
-
-__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
-__version__ = "1.0"
-__status__ = "Production"
-
-# Importation de Tkinter selon la version de Python.
-# Python 2 seulement:
-try:
-    from Tkinter import *
-    import ttk as ttk
-# Python 2 et 3 (Python 2 après ''pip install future''):
-except ImportError:
-    from tkinter import *
-    import tkinter.ttk as ttk
-
-"""
     Le module ``CodeScrolledText``
     ================================
 
@@ -47,16 +30,35 @@ except ImportError:
 
 """
 
+__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
+__version__ = "1.0"
+__status__ = "Production"
+# On cache les classes non nécessaires
+__all__ = ['CodeScrolledText']
+
+# Importation de Tkinter selon la version de Python.
+# Python 2 seulement:
+try:
+    from Tkinter import *
+    import ttk as ttk
+# Python 2 et 3 (Python 2 après ''pip install future''):
+except ImportError:
+    from tkinter import *
+    import tkinter.ttk as ttk
 
 class TextwLineNumbers(Canvas):
     """
         Classe qui hérite de Canvas. Cette classe est utilisé pour
-        redessiner les numéros de ligne accompagné avec le
-        « textwidget ».
+        redessiner les numéros de ligne accompagné avec le « textwidget ».
+        Cette classe est interne au module. Elle est un objet pour la
+        classe central du module : CodeScrolledText.
 
+        :example:
+        >>> test = TextwLineNumbers()
+        >>> test.attach(TextAdvanced())
+        >>> test.redraw()
 
     """
-
     def __init__(self, *args, **kwargs):
         """
             Constructeur de TextwLineNumbers.
@@ -64,7 +66,17 @@ class TextwLineNumbers(Canvas):
             Le constructeurs prend en argument *args et **kwargs pour
             une construction plus complexe du canvas si désiré.
 
+            :example:
+            >>> test = TextwLineNumbers()
+
+            :param *args: variable positional parameter
+            :type *args: argument unpacking
+            :param **kwargs: variable keyword parameter
+            :type **kwargs: keyword argument unpacking
+
+
         """
+        # Initialisation du Canvas et du textwidget.
         Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
         return
@@ -76,6 +88,10 @@ class TextwLineNumbers(Canvas):
             Cette fonction attache le Widget Text « argtextwidget »
             à la classe. Celui-ci devrait être de type « TextAdvanced »
             pour que cette classe puisse redessiner les lignes.
+
+            :example:
+            >>> test = TextwLineNumbers()
+            >>> test.attach(TextAdvanced())
 
             :param argtextwidget: Widget Text du Canvas.
             :type argtextwidget: TextAdvanced
@@ -92,11 +108,22 @@ class TextwLineNumbers(Canvas):
             Lorsque cette classe est attaché au TextAdvanced et que
             celui-ci déclenche sont event, cette fonction est
             appelé et les numéros de lignes sont redessinées.
+
+            :example:
+            >>> test = TextwLineNumbers()
+            >>> test.attach(TextAdvanced())
+            >>> test.redraw()
+
+
         """
-        # Nous supprimons tous du canvas.
+        # Nous supprimons tout du canvas.
         self.delete("all")
         # On remets l'index au début.
-        i = self.textWidget.index("@0,0")
+        try:
+            i = self.textWidget.index("@0,0")
+        except AttributeError:
+            raise AttributeError("Vous devez appeler attach() avant "
+                                "d'appeler redraw().")
         # Pour toutes les lignes existantes nous redéfinisons:
         while True:
             dline = self.textWidget.dlineinfo(i)
@@ -108,20 +135,20 @@ class TextwLineNumbers(Canvas):
             if y > 16635:
                 break
             # On érit le format en Hex (4 bytes) et on l'imprime
-            linetext = format(int(str(i).split(".")[0])-1, '#06x')
+            linetext = format(int(str(i*2).split(".")[0])-1, '#06x')
             self.create_text(2, y, anchor="nw", text=linetext)
             i = self.textWidget.index("%s+1line" % i)
-
 
 class TextAdvanced(Text):
     """
         TextAvanced est tout simplement un Widget Text à lequel on ajoute
         un évènement qui est déclencher lors de l'ajout ou la suppression
-        de ligne.
+        d'une ligne.
 
+        :example:
+        >>> test = TextAdvanced()
 
     """
-
     def __init__(self, *args, **kwargs):
         """
             Constructeur de TextAdvanced.
@@ -129,6 +156,8 @@ class TextAdvanced(Text):
             Le constructeurs prend en argument *args et **kwargs pour
             une construction plus complexe du Text si désiré.
 
+            :example:
+            >>> test = TextAdvanced()
 
         """
         # Initialisation de Text avec les arguments.
@@ -165,24 +194,27 @@ class TextAdvanced(Text):
         '''.format(widget=str(self)))
         return
 
-
 class CodeScrolledText(Frame):
     """
         class CodeScrolledText
         ========================
 
-        Cette classe hérite d'un Widget Frame. Elle y inclut un Widget
-        Text, un Widget Label et un Widget Scrollbar.
+        Cette classe hérite d'un widget Frame. Elle y inclut un widget
+        Text, un widget Label et un widget Scrollbar.
 
+        :example:
+        >>> test = CodeScrolledText(None)
 
     """
-
     def __init__(self, parent):
         """
             Constructeur de CodeScrolledText.
 
             Le constructeur initialise son Frame avec le parent qui est
             donné en argument. Il initialise ses composantes.
+
+            :example:
+            >>> test = CodeScrolledText(None)
 
             :param parent: Widget Parent de la classe.
             :type parent: Widget (Tk)
@@ -237,6 +269,11 @@ class CodeScrolledText(Frame):
             Cette fonction est un wrapper pour la fonction get()
             du TextAdvanced.
 
+            :example:
+            >>> test = CodeScrolledText(None)
+            >>> test.get('0.0', END)
+            u'\\n'
+
             :param start: Position début du texte à extraire.
             :type start: str
             :param stop: Position fin du texte à extraire.
@@ -247,3 +284,8 @@ class CodeScrolledText(Frame):
 
         """
         return self.editArea.get(start, stop)
+
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

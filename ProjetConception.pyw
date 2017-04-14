@@ -13,13 +13,6 @@
     Description     : Démmarrage de l'application.
 
 
-"""
-
-__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
-__version__ = "1.0"
-__status__ = "Production"
-
-"""
     Le module ``ProjetConception``
     ================================
 
@@ -29,6 +22,11 @@ __status__ = "Production"
 
 
 """
+
+__author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
+__version__ = "1.0"
+__status__ = "Production"
+
 
 # Importation des modules nécessaires.
 try:

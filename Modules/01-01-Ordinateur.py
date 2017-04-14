@@ -9,8 +9,18 @@
     Titre           : Interface Ordinateur
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
+    Date            : 13-04-2017
     Description     : Interface ordinateur de l'application.
+
+
+    Le module ``VueOrdinateur``
+    ================================
+
+    Ce module contient la vue « Ordinateur » telle que présentée dans le
+    document de spécification. La classe nommée « VueOrdinateur » gère
+    la création des composantes de cette vue. La classe hérite du widget
+    Frame pour permettre un placement plus polyvalent et une réutilisation
+    plus aisée de cette vue.
 
 
 """
@@ -42,16 +52,6 @@ except ImportError:
     import tkinter.ttk as ttk
     import tkinter.filedialog as fileDialog
 
-"""
-    Le module ``VueOrdinateur``
-    ================================
-
-    Ce module contient la vue « Ordinateur » telle que présentrée dans le
-    document de spécification.
-
-
-"""
-
 
 def __enum(**enums):
     """
@@ -77,9 +77,9 @@ class VueOrdinateur(Frame):
 
         Cette classe hérite d'un Frame. Elle représente la vue
         « Ordinateur » telle que présentée dans le document de
-        spécification. Le Frame inclut les boutons et autres Widgets
-        nécessaires pour la vue.
+        spécification.
 
+        >>> test = VueOrdinateur()
 
     """
 
@@ -92,8 +92,20 @@ class VueOrdinateur(Frame):
             parent donné en argument. Il initialise ensuite les Widgets
             nécessaires de la vue (comme décrit dans le document de
             spécification). La vue crée un objet "Micro-Ordinateur" à partir
-            du module "04-Micro-Ordinateur". Cet objet sera lié (linked)
+            du module "04-Micro-Ordinateur". Cet objet sera lié (bind)
             aux évènements associés (par exemple les boutons de la vue).
+
+            Il y a deux types de façon de créer cette vue, le mode
+            NORMAL (par défaut) et le mode LIGNECOMMANDE. Le mode
+            normal inclut des boutons pour charger un programme
+            exécutable, pour le réinitialiser et pour générer des
+            coups d'horloge. Le mode « ligne de commande » inclut
+            une zone de texte et une entrée pour interprétée en
+            temps réel du code assembleur.
+
+            :example:
+            >>> test1 = VueOrdinateur(Tk(), TypeUse.NORMAL)
+            >>> test2 = VueOrdinateur(Tk(), TypeUse.LIGNECOMMANDE)
 
             :param parent: Parent Widget de la classe.
             :type parent: Widget (Tk)
@@ -228,6 +240,21 @@ class VueOrdinateur(Frame):
         return
 
     def __callbackCMD(self, event):
+        """
+            Callback pour la ligne de commande.
+
+            Cette fonction est appelée lorsque l'utilisateur confirme
+            l'entrée avec la touche retour du clavier. Elle essaie de
+            compiler la ligne de code. Si la compilation est un succès,
+            nous l'exécutons dans le micro-ordinateur. Autrement, nous
+            faisons «flasher» le code illégal.
+
+            :param event: Évènement clavier.
+            :type event: Event
+
+            ..note: Cette fonction est interne à la classe.
+
+        """
         # Compilation du code en bytecode.
         result = modCompiler.compile(self.entryCMD.get())
         # Si la compilation est un succès on l'exécute.
@@ -246,7 +273,7 @@ class VueOrdinateur(Frame):
 
     def __callbackCharger(self):
         """
-            Fonction «callback» pour le bouton «Charger».
+            Callback pour le bouton «Charger».
 
             Cette fonction appelle la fonction appropriée du module
             02-FonctionEditeur. On ouvre une boite système pour faire
@@ -254,6 +281,7 @@ class VueOrdinateur(Frame):
             ensuite la fonction pour charger ce fichier.
 
             ..note: Cette fonction est interne à la classe.
+
         """
         # On demande le chemin du fichier à charger.
         info = fileDialog.askopenfilename(
@@ -277,9 +305,9 @@ class VueOrdinateur(Frame):
 
             Cette fonction appelle la fonction appropriée dans le module
             04-Micro-Ordinateur pour réinitialiser l'état de la machine
-            virtuelle (et en rechargeant en mémoire le dernier exécutable
-            charger ultérieurement, s'il y a eu lieu).
+            virtuelle.
 
+            ..note: Cette fonction est interne à la classe.
 
         """
         # On appelle la fonction approprié.
@@ -295,6 +323,7 @@ class VueOrdinateur(Frame):
             04-Micro-Ordinateur pour donner un coup d'horloge à la machine
             virtuelle.
 
+            ..note: Cette fonction est interne à la classe.
 
         """
         # On appelle la fonction approprié.
@@ -310,6 +339,7 @@ class VueOrdinateur(Frame):
             04-Micro-Ordinateur pour activer/désactiver l'horloge de la
             machine virtuelle.
 
+            ..note: Cette fonction est interne à la classe.
 
         """
         # On appelle la fonction approprié.
@@ -329,6 +359,10 @@ class VueOrdinateur(Frame):
             :return: Retourne le widget liste de la RAM.
             :rtype: Listbox
 
+            :example:
+            >>> test = VueOrdinateur(None)
+            >>> isinstance(test.getListRAM(), Listbox)
+            True
 
         """
         return self.listMemoireRAM
@@ -340,6 +374,10 @@ class VueOrdinateur(Frame):
             :return: Retourne le widget liste de la ROM.
             :rtype: Listbox
 
+            :example:
+            >>> test = VueOrdinateur(None)
+            >>> isinstance(test.getListROM(), Listbox)
+            True
 
         """
         return self.listMemoireROM
@@ -351,6 +389,10 @@ class VueOrdinateur(Frame):
             :return: Retourne le widget liste des IO.
             :rtype: Listbox
 
+            :example:
+            >>> test = VueOrdinateur(None)
+            >>> isinstance(test.getListIO(), Listbox)
+            True
 
         """
         return self.listMemoireIO
@@ -365,8 +407,18 @@ class VueOrdinateur(Frame):
             :param output: Texte à ajouter à la fin de la console.
             :type output: str
 
+            :example:
+            >>> test = VueOrdinateur(None)
+            >>> test.appendConsoleOutput("test")
+
 
         """
-        self.txtvarConsoleOutput += output
+        self.txtvarConsoleOutput.set(self.txtvarConsoleOutput.get() + '\n' + output)
         # Fin de appendConsoleOutput.
-        return self
+        return
+
+
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

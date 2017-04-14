@@ -6,11 +6,21 @@
     Nom du fichier  : 01-02-Editeur.py
 
     Identification  : 01-02-Editeur
-    Titre           : Interface Editeur
+    Titre           : Interface Éditeur
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
-    Description     : Interface editeur de l'application.
+    Date            : 13-04-2017
+    Description     : Interface éditeur de l'application.
+
+
+    Le module ``VueEditeur``
+    ================================
+
+    Ce module contient la vue « Éditeur » telle que présentée dans le
+    document de spécification. La classe nommée « VueEditeur » gère
+    la création des composantes de cette vue. La classe hérite du widget
+    Frame pour permettre un placement plus polyvalent et une réutilisation
+    plus aisée de cette vue.
 
 
 """
@@ -50,27 +60,18 @@ except ImportError:
     import tkinter.filedialog as fileDialog
     import tkinter.messagebox as messageBox
 
-"""
-    Le module ``VueEditeur``
-    ================================
-
-    Ce module contient la vue « Editeur » telle que présentrée dans le
-    document de spécification.
-
-
-"""
-
 
 class VueEditeur(Frame):
     """
         class VueEditeur
         ========================
 
-        Cette classe hérite d'un Frame. Elle représente la vue
-        « Editeur » telle que présentée dans le document de
-        spécification. Le Frame inclut les boutons et autres Widgets
-        nécessaires pour la vue.
+        Cette classe hérite d'un Frame. Elle représente la vue « Editeur »
+        telle que présentée dans le document de spécification. Le Frame
+        inclut les boutons et autres Widgets nécessaires pour la vue.
 
+        :example:
+        >>> test = VueEditeur()
 
     """
 
@@ -88,6 +89,10 @@ class VueEditeur(Frame):
 
             :param parent: Parent Widget de la classe.
             :type parent: Widget (Tk)
+
+            :example:
+            >>> test1 = VueEditeur()
+            >>> test2 = VueEditeur(Tk())
 
             .. warning:: Cette classe a besoin d'avoir accès aux modules
                          « 02-FonctionEditeur » et « 03-Compileur ».
@@ -145,7 +150,7 @@ class VueEditeur(Frame):
 
     def __callbackCompile(self):
         """
-            Fonction «callback» pour le bouton «Compiler».
+            Callback pour le bouton «Compiler».
 
             Cette fonction appelle la fonction appropriée du module
             03-Compiler. Si la compilation est un échec, cette fonction
@@ -238,3 +243,8 @@ class VueEditeur(Frame):
         self.txtConsoleInput.insert("END", code)
         # Fin callbackLoad.
         return
+
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

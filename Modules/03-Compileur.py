@@ -9,8 +9,21 @@
     Titre           : Compilateur
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 10-04-2017
-    Description     : GUI principal de l'application.
+    Date            : 13-04-2017
+    Description     : Compilateur pour le langage assembleur.
+
+
+    Le module ``Compileur``
+    ================================
+
+    Ce module contient la fonction compile(str) pour compiler le langage
+    assembleur donné en argument. Les informations sur la syntaxe et les
+    mots-clés du langage assembleur sont disponibles dans le manuel et 
+    dans le document de spécification. La fonction compile() utilise
+    la fonction interne du module __compileEx(str, str) qui compile une
+    simple ligne de code. Le module utilise plusieurs énumérations et
+    dictionaires pour la rapidité du code et pour éviter les erreurs
+    de programmation.
 
 
 """
@@ -18,12 +31,19 @@
 __author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
+
 def __enum(**enums):
     """
         Création du type Enum pour le besoin de l'application.
 
         :return: Un type Enum
         :rtype: Enum
+
+        >>> ENUMTEST = __enum(VRAI = True, FAUX = False)
+        >>> ENUMTEST.VRAI
+        True
+        >>> ENUMTEST.FAUX
+        False
 
     """
     return type('Enum', (), enums)
@@ -63,10 +83,9 @@ OPCODE = __enum(NOP=0x0000,
 REGISTRE = __enum(A=0x0001, B=0x0002, C=0x0003, D=0x0004)
 
 # Enumeration pour le type d'adressage.
-ADRESSAGE = __enum(REGISTRE=0x0000,
-                   REGISTRE_VERS_ADRESSE=0x0010,
-                   ADRESSE=0x0020,
-                   ADRESSE_VERS_ADRESSE=0x0030)
+ADRESSAGE = __enum(IMMEDIATE=0x0000, # Valeur écrite dans le code
+                   DIRECT=0x0010, # Adresse écrite dans le code
+                   INDIRECT=0x0020) # Adresse dans le registre
 
 def compile(code):
     """
@@ -75,6 +94,18 @@ def compile(code):
         Cette fonction prend un texte (plusieurs lignes) et convertit
         celui-ci en tableau de 16 bits représentant le bytecode ROM du
         code assembleur.
+
+        :example:
+        >>> expect = [True, 
+        ...           [OPCODE.SET | REGISTRE.A | ADRESSAGE.IMMEDIATE,
+        ...           83,
+        ...           OPCODE.ST | REGISTRE.A | ADRESSAGE.DIRECT,
+        ...           16892,
+        ...           OPCODE.HLT,
+        ...           0]]
+        >>> result = compile('SETA 83\\nSTA 16892\\nHLT')
+        >>> expect == result
+        True
 
         :param code: Code (plusieurs lignes) à compiler.
         :type code: str
@@ -164,6 +195,117 @@ def __compileEx(opcode, val):
         dictionnaires et retourne deux ints de 16 bits (8 bits pour
         la commande et 8 bits pour le registre).
 
+
+        :example:
+        >>> # NOP & HLT
+        >>> [OPCODE.NOP, 0x0000] == __compileEx('NOP', '')
+        True
+        >>> [OPCODE.HLT, 0x0000] == __compileEx('HLT', '')
+        True
+
+
+        :example:
+        >>> # JUMPERS
+        >>> [OPCODE.JMP | ADRESSAGE.DIRECT, 0x9999] \
+            == __compileEx('JMP', '0x9999')
+        True
+        >>> [OPCODE.JMZ | ADRESSAGE.DIRECT, 0x8888] \
+            == __compileEx('JMZ', '0x8888')
+        True
+        >>> [OPCODE.JMO | ADRESSAGE.DIRECT, 0x7777] \
+            == __compileEx('JMO', '0x7777')
+        True
+        >>> [OPCODE.JMC | ADRESSAGE.DIRECT, 0x6666] \
+            == __compileEx('JMC', '0x6666')
+        True
+
+
+        :example:
+        >>> # SET & MOVERS
+        >>> [OPCODE.SET | REGISTRE.A | ADRESSAGE.IMMEDIATE , ord('A')] \
+            == __compileEx('SETA', "\'A\'")
+        True
+        >>> [OPCODE.LD | REGISTRE.B | ADRESSAGE.DIRECT, 0x5555] \
+            == __compileEx('LDB', '0x5555')
+        True
+        >>> [OPCODE.LD | REGISTRE.B, REGISTRE.C] \
+            == __compileEx('LDB', 'C')
+        True
+        >>> [OPCODE.ST | REGISTRE.C | ADRESSAGE.DIRECT, 0x3333] \
+            == __compileEx('STC', '0x3333')
+        True
+        >>> [OPCODE.ST | REGISTRE.C, REGISTRE.C] \
+            == __compileEx('STC', 'C')
+        True
+        >>> [OPCODE.ST | REGISTRE.D, REGISTRE.A] \
+            == __compileEx('STD', 'A')
+        True
+
+
+        :example:
+        >>> # ALU SPECIFIC
+        >>> [OPCODE.ADD | REGISTRE.A, REGISTRE.B] \
+            == __compileEx('ADDA', 'B')
+        True
+        >>> [OPCODE.SUB | REGISTRE.B, REGISTRE.C] \
+            == __compileEx('SUBB', 'C')
+        True
+        >>> [OPCODE.MUL | REGISTRE.C, REGISTRE.D] \
+            == __compileEx('MULC', 'D')
+        True
+        >>> [OPCODE.DIV | REGISTRE.D, REGISTRE.A] \
+            == __compileEx('DIVD', 'A')
+        True
+
+
+        :example:
+        >>> # BITWISE
+        >>> [OPCODE.OR | REGISTRE.A, REGISTRE.B] \
+            == __compileEx('ORA', 'B')
+        True
+        >>> [OPCODE.AND | REGISTRE.B, REGISTRE.C] \
+            == __compileEx('ANDB', 'C')
+        True
+        >>> [OPCODE.XOR | REGISTRE.C, REGISTRE.D] \
+            == __compileEx('XORC', 'D')
+        True
+        >>> [OPCODE.NOT | REGISTRE.D, 0x0000] \
+            == __compileEx('NOTD', '')
+        True
+
+
+        :example:
+        >>> # COMPARATORS
+        >>> [OPCODE.LT | REGISTRE.A, REGISTRE.B] \
+            == __compileEx('LTA', 'B')
+        True
+        >>> [OPCODE.GT | REGISTRE.B, REGISTRE.C] \
+            == __compileEx('GTB', 'C')
+        True
+        >>> [OPCODE.LE | REGISTRE.C, REGISTRE.D] \
+            == __compileEx('LEC', 'D')
+        True
+        >>> [OPCODE.GE | REGISTRE.D, REGISTRE.A] \
+            == __compileEx('GED', 'A')
+        True
+        >>> [OPCODE.EQ | REGISTRE.A, REGISTRE.B] \
+            == __compileEx('EQA', 'B')
+        True
+        >>> [OPCODE.EZ | REGISTRE.B, 0x0000] \
+            == __compileEx('EZB', '')
+        True
+        >>> [OPCODE.NZ | REGISTRE.C, 0x0000] \
+            == __compileEx('NZC', '')
+        True
+
+
+        :example:
+        >>> # DTA
+        >>> [OPCODE.DTA, ord("Z")] \
+            == __compileEx('DTA', "\'Z\'")
+        True
+
+
         :param opcode: Partie de gauche d'une ligne de code assembleur.
         :type opcode: str
         :param val: Partie de droite d'une ligne de code assembleur.
@@ -221,7 +363,8 @@ def __compileEx(opcode, val):
         'SET' : OPCODE.SET,
         'HLT' : OPCODE.HLT,
         'ADD' : OPCODE.ADD,
-        'SUB' : OPCODE.MUL,
+        'SUB' : OPCODE.SUB,
+        'MUL' : OPCODE.MUL,
         'DIV' : OPCODE.DIV,
         'AND' : OPCODE.AND,
         'XOR' : OPCODE.XOR,
@@ -246,7 +389,7 @@ def __compileEx(opcode, val):
     if {OPCODE.JMC : False, OPCODE.JMZ : False,
         OPCODE.JMO : False, OPCODE.JMC : False,
         OPCODE.NOP : False, OPCODE.HLT : False,
-        OPCODE.DTA : False, }.get(_16bitsOPCODE, True):
+        OPCODE.DTA : False, OPCODE.JMP : False}.get(_16bitsOPCODE, True):
         # On cherche dans le dictionnaire si la valeur est présente:
         reg = dictREG.get(opcode[indexReg], None)
         # Si oui, on ajoute (avec OR bitwise) dans la valeur du
@@ -275,24 +418,22 @@ def __compileEx(opcode, val):
         _16bitsRight = dictREG.get(val, None)
         if _16bitsRight is None:
             raise CompilationErreur("INVALID RIGHT REG")
-        # Ajoute le mode d'adressage en mode « Argument est une registre ».
-        _16bitsLeft |= ADRESSAGE.REGISTRE
     # Si l'OPCODE a une valeur dans les bits droits
     elif OPCODE.SET == _16bitsOPCODE:
         _16bitsRight = stringToInt(val)
         if _16bitsRight > 0xFFFF:
             raise CompilationErreur("INVALID RIGHT VALUE")
+        # Ajoute le mode d'adressage en mode « Argument est une registre ».
+        _16bitsLeft |= ADRESSAGE.IMMEDIATE
     # Si l'OPCODE a une adresse* dans les bits droits
     elif {OPCODE.LD : True, OPCODE.ST : True}.get(_16bitsOPCODE, False):
         _16bitsRight = dictREG.get(val, None)
         if _16bitsRight is None:
+            _16bitsRight = stringToInt(val)
             if _16bitsRight > 0xFFFF:
                 raise CompilationErreur("INVALID RIGHT ARG")
             # Mode d'adressage en mode « Argument est une ADRESSE ».
-            _16bitsLeft |= ADRESSAGE.ADRESSE
-        else:
-            # Mode d'adressage en mode « Argument est un registre ».
-            _16bitsLeft |= ADRESSAGE.REGISTRE
+            _16bitsLeft |= ADRESSAGE.DIRECT
     # Si l'OPCODE a une adresse dans les bits droits
     elif {OPCODE.JMP : True, OPCODE.JMZ : True,
           OPCODE.JMO : True, OPCODE.JMC : True,
@@ -301,10 +442,9 @@ def __compileEx(opcode, val):
         if _16bitsRight > 0xFFFF:
             raise CompilationErreur("INVALID RIGHT ADDRESS")
         # Ajoute le mode d'adressage en mode « Argument est une ADRESSE ».
-        _16bitsLeft |= ADRESSAGE.ADRESSE
+        _16bitsLeft |= ADRESSAGE.DIRECT
     elif OPCODE.DTA == _16bitsOPCODE:
-        # Ajoute le mode d'adressage en mode « Argument est une ADRESSE ».
-        _16bitsLeft |= ADRESSAGE.ADRESSE
+        _16bitsRight = stringToInt(val)
 
     # On retourne nos deux 16 bits de données.
     return [_16bitsLeft, _16bitsRight]
@@ -317,21 +457,22 @@ def stringToInt(val):
         Cette fonction convertit (selon la représentation) un
         string en int.
 
+        :example:
         >>> stringToInt("99")
         99
         >>> stringToInt("'a'")
         97
         >>> stringToInt("0b1001")
-        5
+        9
         >>> stringToInt("0o07")
         7
         >>> stringToInt("0x0A")
         10
 
-        :param val:
-        :type val:
-        :return:
-        :rtype:
+        :param val: String avec une représentation quelconque.
+        :type val: str
+        :return: Nombre égal à la représentation.
+        :rtype: int
 
     """
     # Conversion ASCII vers Int. Eg. 'a'
@@ -355,16 +496,34 @@ def stringToInt(val):
 
 class CompilationErreur(Exception):
     """
-       Classe d'exception pour la compilation.
+        Classe d'exception pour la compilation.
 
-       Il s'agit simplement d'un classe qui hérite de la classe
-       Exception de base de Python. Elle sera utilisée lors d'une
-       exception lors de la compilation ligne par ligne 
-       (voir __compileEx).
+        Il s'agit simplement d'un classe qui hérite de la classe
+        Exception de base de Python. Elle sera utilisée lors d'une
+        exception lors de la compilation ligne par ligne 
+        (voir __compileEx).
+
+        :example:
+        >>> val = CompilationErreur("TEST")
+        >>> val
+        CompilationErreur()
+        >>> val.value
+        'TEST'
 
 
     """
     def __init__(self, value):
+        """
+            Constructeur de l'exception.
+
+            :param value: Code d'erreur ou message d'erreur.
+            :type value: int or str
+
+        """
         self.value = value
-    def __str__(self):
-        return repr(self.value)
+
+
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
