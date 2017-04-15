@@ -1,3 +1,5 @@
+# module Memoire
+import 04-04-Memoire
 """
     Projet          : Editeur, Compilateur et Micro-Ordinateur pour
                       un langage assembleur.
@@ -48,8 +50,11 @@ class cpu:
     regC=0              # registre C
     regD=0              # registre D
     Status=[16]         # registre de Status
-    memory={}           # memoire
+    memory=None         # memoire
     critic =0           # condiiton d'arret d'execution
+    ram ={}             # ram
+    rom{}               # rom
+    io={}               # io
     
 
     registres ={'1':regA,'2':regB,'3':regC,'4':regD} #registre de A-D;
@@ -70,6 +75,7 @@ class cpu:
         self.bus = bus
         bus.register(self)
         self.alu = alu(bus)
+        self.memory = Memoire(bus,self.ram,self.io,self.rom)
     def event(self):
         """
             Fonction event.
@@ -171,9 +177,9 @@ class cpu:
           if self.c==1280:
                 self.registres[str(self.d)] = int(self.code[1])
           if self.c==1792 or self.c==1536:
-                self.memory[self.b] = int(self.bus.data)
+                self.memory.setMemory(self.b,int(self.bus.data))
           if self.c ==2048:
-                self.registres[str(self.d)] = self.memory[self.b]
+                self.registres[str(self.d)] = self.memory.getMemory(self.b)
           if self.c==8448:
                 print(" or binaire")
                 x = self.registres[str(self.d)]|self.registres[str(self.b)]
@@ -245,11 +251,11 @@ class cpu:
                 print("arret d'execution a cause de l'instruction HALT ")
       
                 
-          print("affichage de la memoire")
-          print(self.memory)
-          print("affichage des registres")
-          print(self.registres)
-          self.bus.mode =0
+          #print("affichage de la memoire")
+          #print(self.memory)
+          #print("affichage des registres")
+          #print(self.registres)
+          #self.bus.mode =0
           
     def Clock(self):
         self.Fetch()
