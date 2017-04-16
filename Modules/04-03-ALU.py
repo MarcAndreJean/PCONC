@@ -72,7 +72,7 @@ class alu:
         """
             FonctionMUL
             Cette fonction permet de retourner le resultat de la multiplication de reg1 par reg2
-        >>>fonctionSUB(2,2)
+        >>>fonctionMUL(2,2)
         4
         """
         return reg1*reg2
@@ -80,7 +80,7 @@ class alu:
         """
             FonctionDIV
             Cette fonction permet de retourner le resultat de la division entiere de reg1 par reg2
-        >>>fonctionSUB(1,3)
+        >>>fonctionDIV(1,3)
         0
         """
         return reg1//reg2
