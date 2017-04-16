@@ -134,7 +134,7 @@ class TextwLineNumbers(Canvas):
                 break
             y = dline[1]
             # On quitte si nous avons dépasser le nombre maximal en ROM
-            if y > 16635:
+            if y > 0x40FB:
                 break
             # On érit le format en Hex (4 bytes) et on l'imprime
             linetext = format((int(str(i).split(".")[0]) - 1) * 2, '#06x')

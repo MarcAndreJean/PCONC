@@ -79,7 +79,9 @@ def loadTextCode(path):
     """
     # On ouvre le fichier
     fichier = open(path, "r")
+    # Nous lisons le texte et le transfèrons dans notre variable.
     code = fichier.read()
+    # On ferme le fichier et on retourne le code.
     fichier.close()
     return code
 
@@ -109,8 +111,8 @@ def saveByteCode(path, bytecode):
             # On écrit les 16 bits
             fichier.write(struct.pack('>H', bytecode[i]))
         # Nous finnisons de remplir le fichier avec des NOP (0x0000)
-        if (len(bytecode) < 0xFFFF):
-            for i in range(len(bytecode), 0xFFFF + 1):
+        if (len(bytecode) < 0x40FB):
+            for i in range(len(bytecode), 0x40FB + 1):
                 fichier.write(struct.pack('>H', 0))
     # Si une erreur survient
     except Exception as e:
@@ -146,12 +148,13 @@ def loadByteCode(path):
     bytecode = []
     try:
         # Nous écrivons les bytes (16 bits) en argument.
-        for i in range(0, 0xFFFF + 1):
+        for i in range(0, 0x40FB + 1):
             bytecode.append(int(struct.unpack('>H', fichier.read(2))[0]))
     # Si une erreur survient
     except Exception as e:
         fichier.close()
         raise e
+    # On ferme le fichier et on revoie le résultat.
     fichier.close()
     return bytecode
 

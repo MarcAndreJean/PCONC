@@ -32,63 +32,16 @@ __author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
 
-
-def __enum(**enums):
-    """
-        Création du type Enum pour le besoin de l'application.
-
-        :return: Un type Enum
-        :rtype: Enum
-
-        >>> ENUMTEST = __enum(VRAI = True, FAUX = False)
-        >>> ENUMTEST.VRAI
-        True
-        >>> ENUMTEST.FAUX
-        False
-
-    """
-    return type('Enum', (), enums)
-
-
-# Enumération pour les opérateurs.
-OPCODE = __enum(NOP=0x0000,
-                JMP=0x0100,
-                JMZ=0x0200,
-                JMO=0x0300,
-                JMC=0x0400,
-                SET=0x0500,
-                LD=0x0600,
-                ST=0x0700,
-                MV=0x0800,
-                HLT=0x0F00,
-                # Commande pour l'ALU.
-                ADD=0x1100,
-                SUB=0x1200,
-                MUL=0x1300,
-                DIV=0x1400,
-                OR=0x2100,
-                AND=0x2200,
-                XOR=0x2300,
-                NOT=0x2400,
-                # Comparateurs.
-                LT=0x3100,
-                GT=0x3200,
-                LE=0x3300,
-                GE=0x3400,
-                EQ=0x3500,
-                EZ=0x3600,
-                NZ=0x3700,
-                # --Chaine de caractères.
-                DTA=0XFFFF)
-
-# Enumération pour le registre.
-REGISTRE = __enum(A=0x0001, B=0x0002, C=0x0003, D=0x0004)
-
-# Enumeration pour le type d'adressage.
-ADRESSAGE = __enum(IMMEDIATE=0x0000,  # Valeur écrite dans le code
-                   DIRECT=0x0010,  # Adresse écrite dans le code
-                   INDIRECT=0x0020)  # Adresse dans le registre
-
+# Importation des modules nécessaires.
+try:
+    modEnum = __import__("05-Enum")
+except ImportError:
+    import importlib
+    modEnum = importlib.import_module("Modules.05-Enum")
+# Redéfinition.
+OPCODE = modEnum.OPCODE
+ADRESSAGE = modEnum.ADRESSAGE
+REGISTRE = modEnum.REGISTRE
 
 def compile(code):
     """
@@ -196,7 +149,8 @@ def compile(code):
                 return [False, "Ligne " + str(linenum) +
                         " : L'argument de droite est invalide."]
         linenum += 1
-        if linenum > 0xFFFF:
+        # On vérifie si la taille de la ROM ne fait pas de buffer overflow.
+        if linenum > 0x40FB:
             return [False, "Erreur : Dépassement de la mémoire ROM."]
     # On envoie les résultats à la fin.
     return [True, bytecode]
