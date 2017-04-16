@@ -97,7 +97,7 @@ class MicroOrdinateur():
 
     def load(self, bytecode):
         """
-            Fonction pour charger en dans la ROM un programme.
+            Fonction pour charger bytecode dans la ROM un programme.
 
             Cette fonction charge un programme (celui dans bytecode) dans
             la mémoire ROM du micro-ordinateur.
@@ -105,16 +105,6 @@ class MicroOrdinateur():
             :example:
             >>> test = MicroOrdinateur()
             >>> test.load([0xFAFA, 0xAFAF, 0x0000, 0xFFFF])
-            >>> test.memoire.getMemory(0x0000) == 0xFAFA
-            True
-            >>> test.memoire.getMemory(0x0001) == 0xAFAF
-            True
-            >>> test.memoire.getMemory(0x0002) == 0x0000
-            True
-            >>> test.memoire.getMemory(0x0003) == 0xFFFF
-            True
-            >>> test.memoire.getMemory(0x40FB) == 0x0000
-            True
 
             :param bytecode: Tableau de int (16 bits) d'un programme
                              exécutable.
@@ -123,17 +113,7 @@ class MicroOrdinateur():
         """
         # On réinitialise le micro-ordinateur.
         self.reset()
-        # On parcourt toutes les adresses de la mémoire ROM.
-        for adresse in range(min(len(bytecode), 0x40FB + 1)):
-            # On transfert le bytecode[adresse] à l'adresse.
-            self.memoire.setMemory(adresse, bytecode[adresse])
-        # Si le bytecode est plus petit que la taille max de la mémoire
-        # ROM, on mets dans zéro pour le reste des cases.
-        if len(bytecode) < 0x40FB + 1:
-            # On attribut des zéros pour ces cases.
-            for adresse in range(len(bytecode), 0x40FB + 1):
-                self.memoire.setMemory(adresse, 0x0000)
-        # Fin.
+        self.memoire.uploadProgram(bytecode)
         return
 
     def reset(self):
@@ -151,14 +131,12 @@ class MicroOrdinateur():
             True
 
         """
+        # On s'assure que le clock n'est pas en marche.
+        self.clockActive = False
+        if clockThread is not None and clockThread.isAlive():
+            clockThread.join()
         # On réinitialise les composants de base.
-        self.memoire.reset()
         self.bus.reset()
-        self.cpu.reset()
-        # On réinitialise les composants supplémentaires.
-        for comp in self.xtracomp:
-            if comp.reset:
-                comp.reset()
         # Fin de la fonction.
         return
 

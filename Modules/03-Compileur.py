@@ -357,18 +357,18 @@ def stringToInt(val):
         return ord(val[1])
     # Sinon, conversion String/Décimal vers int. Eg.: 10
     try:
-        return int(val)  # Décimal
+        return abs(int(val))  # Décimal
     except ValueError:
         # Sinon, conversion String/Binaire vers int. Eg.: 0b0101
         try:
-            return int(val, 2)  # Binaire
+            return abs(int(val, 2))  # Binaire
         except ValueError:
             # Sinon, conversion String/Octal vers int. Eg.: 0o76
             try:
-                return int(val, 8)  # Octal
+                return abs(int(val, 8))  # Octal
             except ValueError:
                 # Sinon, conversion String/Hex vers int. Eg.: 0xA6
-                return int(val, 16)  # Hex
+                return abs(int(val, 16))  # Hex
 
 
 class CompilationErreur(Exception):

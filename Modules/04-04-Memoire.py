@@ -6,11 +6,18 @@
     Nom du fichier  : 04-04-Memoire.py
 
     Identification  : 04-04-Memoire
-    Titre           : Module memoire
+    Titre           : Mémoire
     Auteurs         : Francis Emond, Malek Khattech,
                       Mamadou Dia, Marc-André Jean
-    Date            : 11-04-2017
-    Description     : Module mémoire de l'ordinateur.
+    Date            : 15-04-2017
+    Description     : Module mémoire du Micro-Ordinateur.
+
+
+    Le module ``Mémoire``
+    ================================
+
+    Ce module est le composant mémoire de l'ordinateur, tel que	
+    présenté dans le document de spécification.
 
 
 """
@@ -19,17 +26,17 @@ __author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
 __status__ = "Production"
 
+
 # Importation des modules nécessaires.
-
-
-"""
-    Le module ``Mémoire``
-    ================================
-
-    Ce module le composant mémoire de l'ordinateur, tel que	
-    présenté dans le document de spécification.
-
-"""
+try:
+    modEnum = __import__("05-Enum")
+    __import__("04-01-Bus")
+except ImportError:
+    import importlib
+    modEnum = importlib.import_module("Modules.05-Enum")
+    importlib.import_module("Modules.04-01-Bus")
+# Redéfinition.
+MODE = modEnum.MODE
 
 
 class Memoire:
@@ -37,90 +44,101 @@ class Memoire:
         class Memoire
         ========================
 
-        Cette classe représente le composant  « Memoire » tel que
+        Cette classe représente le composant « Memoire » tel que
         présenté dans le document de spécification. 
+        
 
     """
 
     # Constructeur.
-    def __init__(self, The_Bus, romTab, ioTab, ramTab):
+    def __init__(self, bus):
         """
-            Constructeur de la classe Memoire
+            Constructeur de la classe Memoire.
+
+			Le constructeur s'occupe d'initialiser la mémoire et lie
+			ce composant avec le bus.
+
+			:param bus: Composant Bus du Micro-Ordinateur.
+			:type bus: Bus
 
         """
-        # --Bus.
-	self.bus = The_Bus #Objet bus déjà créé ppar l'ordinateur et passé en paramètre
-	The_Bus.register(self)
+        # Bus.
+        self.bus = bus
+        bus.register(self)
 
-        # --Memory mapping.
-	self.rom = romTab	#adr values 0-16635
-	self.io = ioTab		#adr values 16636-32767
-	self.ram = ramTab 	#adr values 32768-65535
-
+		# Tableau de int pour représenter la mémoire.
+        self._data = [0]*(0xFFFF + 1)
+        return
+    
     def event(self):
         """
-            Fonction event.
-	    
+            Récepteur pour le signal event.
 
-
+            Cette fonction est appelé lorsqu'un event est émit
+            sur le bus. Elle gère l'écriture et la lecture en mémoire.
+            
         """
-	
-       return
+        # Si en mode LECTURE:
+        if (self.bus.mode == MODE.READ):
+            # On mets la valeur de la case mémoire à l'adresse bus.address
+            # dans le bus.data.
+            self.bus.data = self._data[self.bus.address]
+            self.bus.mode = MODE.INACTIVE
+        # Si en mode ÉCRITURE:
+        elif (bus.mode == MODE.WRITE):
+            # On mets la valeur de bus.data dans la case mémoire
+            # à l'adresse bus.address.
+            self._data[self.bus.address] = self.bus.data
+            self.bus.mode = MODE.INACTIVE
+        return
 
     def clock(self):
-	"""
-	    Fonction clock.
+        """
+            Récepteur pour le signal clock.
 
+            Cette fonction est appelé lorsqu'un coup d'horloge est émit
+            sur le bus. Elle gère la réinitialisation de la mémoire si
+            le bus est en mode RESET.
+            
+        """
+        # On réinitialise la mémoire si le bus est en mode reset.
+        if (bus.mode == MODE.RESET):
+            for i in range (0x40FB + 1, 0xFFFF + 1):
+                self._data[i] = 0x0000
+        # Fin de la fonction.
+        return
+    
+    def uploadProgram(self, bytecode):
+        """
+            Fonction pour charger bytecode dans la ROM.
 
-	"""
+            Cette fonction charge un programme (celui dans bytecode) dans
+            la mémoire ROM.
 
-    	return
-	
-    def setMemory(self, adr, value):
-	"""
-	    Fonction setMemory.
-	    Cette fonction permet de modifier la valeur d'une case mémoire (adr) pour celle donnée en argument (value).
-	
-	    :param adr: Adresse de la case mémoire a modifier
-	    :type adr: Int
-	    :param value: Nouvelle valeur a inscrire dans la mémoire
-	    :type value: Int
+            :example:
+            >>> test = Memoire()
+            >>> test.uploadProgram([0xFAFA, 0xAFAF, 0x0000, 0xFFFF])
 
-	    :Example:
-	    
-	    >>>setMemory(self, 32768, 12345)
-	    >>>setMemory(self, 1000, -123)
-	    >>>self.ram[32768]
-	    12345
-	    >>>self.ram[1000]
-	    -123
-	    >>>self.ram[0]
-	    0
-	 
-	"""
+            :param bytecode: Tableau de int (16 bits) d'un programme
+                             exécutable.
+            :type bytecode: int[]
+            
+            
+        """
+        # On parcourt toutes les adresses de la mémoire ROM.
+        for adresse in range(min(len(bytecode), 0x40FB + 1)):
+            # On transfert le bytecode[adresse] à l'adresse.
+            self._data[adresse] = bytecode[adresse]
+        # Si le bytecode est plus petit que la taille max de la mémoire
+        # ROM, on mets dans zéro pour le reste des cases.
+        if len(bytecode) < 0x40FB + 1:
+            # On attribut des zéros pour ces cases.
+            for adresse in range(len(bytecode), 0x40FB + 1):
+            self._data[adresse] = 0x0000
+        # Fin.
+        return
 
-    	self.ram[adr] = value
-
-    def getMemory(self, adr):
-	"""
-	    Fonction getMemory.
-	    Cette fonction permet d'aller chercher la valeur d'une case mémoire donnée (adr).
-
-	    :param adr: Adresse de la case mémoire dont la valeur est retournée	
-	    :type adr: Int
-	    :return: Retourne la valeur de la case mémoire 'adr'.
-	    :rtype: Int
-
-	    :Example:
-	    >>>setMemory(self, 32768, -400)
-	    >>>setMemory(self, 2222, 999)
-	    >>>getMemory(self, 0)
-	    0
-	    >>>getMemory(self, 32768)
-	    -400
-	    >>>getMemory(self, 2222)
-	    999
-
-	"""
-
-    	return self.ram[adr]
+# Activation des doctest
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
