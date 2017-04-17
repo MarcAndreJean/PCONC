@@ -138,7 +138,7 @@ class cpu:
           print("EXECUTE")
           if self.c==4352:
                 value1 =self.registres[str(self.d)]
-                value2 =self.registres[str(self.b)]
+                value2 =int(self.b)
                 x=alu.fonctionADD(value1,value2)
                 if(x>65535):
                       self.registres['5'][14] = 1
@@ -147,7 +147,7 @@ class cpu:
                       self.registres['5'][15] = 1
           if self.c==4608:
                 value1 =self.registres[str(self.d)]
-                value2 =self.registres[str(self.b)]
+                value2 =int(self.b)
                 x=alu.fonctionSUB(value1,value2)
                 if(x<0):
                       self.registres['5'][15] = 1
@@ -156,7 +156,7 @@ class cpu:
                 self.registres[str(self.d)]=x
           if self.c==4864:
                 value1 =self.registres[str(self.d)]
-                value2 =self.registres[str(self.b)]
+                value2 =int(self.b)
                 x=alu.fonctionMUL(value1,value2)
                 if(x>65535):
                       self.registres['5'][14] = 1
@@ -165,7 +165,7 @@ class cpu:
                 self.registres[str(self.d)]=x
           if self.c==5120:
                 value1 =self.registres[str(self.d)]
-                value2 =self.registres[str(self.b)]
+                value2 =int(self.b)
                 x=alu.fonctionDIV(value1,value2)
                 if(x>65535):
                       self.registres['5'][14] = 1
