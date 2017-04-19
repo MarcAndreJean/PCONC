@@ -137,7 +137,8 @@ class TextwLineNumbers(Canvas):
             if y > 0x40FB:
                 break
             # On érit le format en Hex (4 bytes) et on l'imprime
-            linetext = '0x' + format((int(str(i).split(".")[0]) - 1) * 2, '#06X')[2:]
+            linetext = '0x' + \
+                format((int(str(i).split(".")[0]) - 1) * 2, '#06X')[2:]
             self.create_text(2, y, anchor="nw", text=linetext)
             i = self.textWidget.index("%s+1line" % i)
 

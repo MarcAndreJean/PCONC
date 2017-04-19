@@ -50,11 +50,12 @@ ADRESSAGE = modEnum.ADRESSAGE
 #  - Zero
 #  - CND
 # Enumération pour le registre STATUS.
-STATUS = modEnum.enum(PARITY = 0x0001, # 0b 0000 0000 0000 0001
-                      SIGN = 0x0002,   # 0b 0000 0000 0000 0010
-                      CARRY = 0x0004,  # 0b 0000 0000 0000 0100
-                      ZERO = 0x0008,   # 0b 0000 0000 0000 1000
-                      CND = 0x0010)    # 0b 0000 0000 0001 0000
+STATUS = modEnum.enum(PARITY=0x0001,  # 0b 0000 0000 0000 0001
+                      SIGN=0x0002,   # 0b 0000 0000 0000 0010
+                      CARRY=0x0004,  # 0b 0000 0000 0000 0100
+                      ZERO=0x0008,   # 0b 0000 0000 0000 1000
+                      CND=0x0010)    # 0b 0000 0000 0001 0000
+
 
 class CPU:
     """
@@ -86,9 +87,9 @@ class CPU:
         # Création de l'ALU.
         self.alu = modALU.ALU()
         # Création des registres.
-        self.regP = 0x0000 # Program counter.
-        self.regI = 0x0000 # Instruction register.
-        self.regS = 0x0000 # Status Register.
+        self.regP = 0x0000  # Program counter.
+        self.regI = 0x0000  # Instruction register.
+        self.regS = 0x0000  # Status Register.
         # Registres A, B, C, D
         self.regA = 0x0000
         self.regB = 0x0000
@@ -123,7 +124,6 @@ class CPU:
             raise Exception()
         # Fin impossible.
         return
-
 
     def _setReg(self, registre, valeur):
         """
@@ -162,9 +162,9 @@ class CPU:
         # On réinitialise le CPU si le bus est en mode reset.
         if self.bus.mode == MODE.RESET:
             # Registres program.
-            self.regP = 0x0000 # Program counter.
-            self.regI = 0x0000 # Instruction register.
-            self.regS = 0x0000 # Status Register.
+            self.regP = 0x0000  # Program counter.
+            self.regI = 0x0000  # Instruction register.
+            self.regS = 0x0000  # Status Register.
             # Registres A, B, C, D
             self.regA = 0x0000
             self.regB = 0x0000
@@ -194,7 +194,8 @@ class CPU:
             self.bus.data = self._getReg(self.bus.data)
             return
 
-        # 2. L'argument est l'adresse d'un registre qui pointe vers une adresse.
+        # 2. L'argument est l'adresse d'un registre qui pointe vers une
+        # adresse.
         elif adressage == ADRESSAGE.ADDR_FROM_REG:
             # On fetch l'adresse indiquer dans ce registre.
             self.bus.address = self._getReg(self.bus.data)
@@ -245,12 +246,12 @@ class CPU:
 
         """
         # On vérifie si l'opération n'a pas besoin d'argument droit:
-        if {OPCODE.NOT : True,
-            OPCODE.EZ : True,
-            OPCODE.NZ : True,
-            OPCODE.NOP : True,
-            OPCODE.HLT : True}.get(self.regI, False):
-            return # On quitte pour aller à l'étape d'exécution.
+        if {OPCODE.NOT: True,
+            OPCODE.EZ: True,
+            OPCODE.NZ: True,
+            OPCODE.NOP: True,
+                OPCODE.HLT: True}.get(self.regI, False):
+            return  # On quitte pour aller à l'étape d'exécution.
         # Sinon on fetch l'argument de droit:
         else:
             # On place le bus en mode lecture.
@@ -282,7 +283,7 @@ class CPU:
         # ADD, SUB, MUL, DIV
         # OR, AND, XOR, NOT
         elif opcode & 0xF000 == 0x1000 \
-        or opcode & 0xF000 == 0x2000:
+                or opcode & 0xF000 == 0x2000:
             # Reset regS 0x00FF to 0x0000.
             self.regS = 0x0000
 
@@ -323,7 +324,6 @@ class CPU:
             elif opcode == OPCODE.NOT:
                 result = self.alu.fonctionNOT(self._getReg(regG))
 
-
             # Vérification pour registre STATUS.
             # --Parité.
             self.regS |= (result & STATUS.PARITY)
@@ -344,7 +344,6 @@ class CPU:
             if result == 0x0000:
                 # Si le résultat est égal à zéro, Zero = True
                 self.regS |= STATUS.ZERO
-
 
             # On mets le résultat dans le registre A-D.
             self._setReg(regG, result)
@@ -381,7 +380,7 @@ class CPU:
             elif opcode == OPCODE.NZ:
                 result = self.alu.fonctionNZ(self._getReg(regG))
             # On applique le résultat.
-            if result == True:
+            if result:
                 self.regS |= STATUS.CND
         # JMP, JMZ, JMO, JMC, HLT, SET, LD, ST, MV
         elif opcode & 0xF000 == 0x0000:
@@ -394,21 +393,21 @@ class CPU:
                 return
             # Si le OPCODE est JMZ et flag ZERO ON (résoudre l'adresse)
             elif opcode == OPCODE.JMZ \
-            and self.regS & STATUS.ZERO == STATUS.ZERO:
+                    and self.regS & STATUS.ZERO == STATUS.ZERO:
                 self._readAddress()
                 self.regP = self.bus.address
                 self.bus.mode = MODE.END
                 return
             # Si le OPCODE est JMO et flag CARRY ON (résoudre l'adresse)
             elif opcode == OPCODE.JMO \
-            and self.regS & STATUS.CARRY == STATUS.CARRY:
+                    and self.regS & STATUS.CARRY == STATUS.CARRY:
                 self._readAddress()
                 self.regP = self.bus.address
                 self.bus.mode = MODE.END
                 return
             # Si le OPCODE est JMC et flag CND ON (résoudre l'adresse)
             elif opcode == OPCODE.JMC \
-            and self.regS & STATUS.CND == STATUS.CND:
+                    and self.regS & STATUS.CND == STATUS.CND:
                 self._readAddress()
                 self.regP = self.bus.address
                 self.bus.mode = MODE.END
@@ -451,6 +450,7 @@ class CPU:
             self.bus.mode = MODE.HALT
         # Fin.
         return
+
 
 # Activation des doctest
 if __name__ == "__main__":

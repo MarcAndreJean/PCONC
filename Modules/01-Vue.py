@@ -114,6 +114,7 @@ class VueGlobal(Frame):
         # Fin de __init__.
         return
 
+
 # Activation des doctest
 if __name__ == "__main__":
     import doctest

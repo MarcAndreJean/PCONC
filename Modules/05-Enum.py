@@ -41,11 +41,12 @@ def enum(**enums):
     """
     return type('Enum', (), enums)
 
+
 # Énumération pour le mode du bus.
-MODE = enum(INERTE=0x0000, 
-            READ=0x0001, 
+MODE = enum(INERTE=0x0000,
+            READ=0x0001,
             WRITE=0x0002,
-            END=0x0004, # Fin instruction
+            END=0x0004,  # Fin instruction
             RESET=0x0008,
             HALT=0x0009)
 
@@ -88,10 +89,10 @@ REGISTRE = enum(A=0x0001, B=0x0002, C=0x0003, D=0x0004)
 # 2. L'argument est l'adresse d'un registre qui pointe vers une adresse.
 # 3. L'argument est une adresse.
 # 4. L'argument est une adresse qui pointe vers une adresse.
-ADRESSAGE = enum(ADDR_OF_REG = 0x0010,
+ADRESSAGE = enum(ADDR_OF_REG=0x0010,
                  ADDR_FROM_REG=0x0020,
-                 ADDR =0x0030,
-                 ADDR_FROM_ADDR = 0x0040) 
+                 ADDR=0x0030,
+                 ADDR_FROM_ADDR=0x0040)
 
 
 # Activation des doctest

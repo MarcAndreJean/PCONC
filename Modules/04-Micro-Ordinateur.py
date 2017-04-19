@@ -153,7 +153,7 @@ class MicroOrdinateur():
         """
         # On reset le bus et les éléments.
         self.bus.mode = MODE.RESET
-        self.tick() # Thread safe.
+        self.tick()  # Thread safe.
         # Retour à la normale.
         self.bus.mode = MODE.END
         return
@@ -240,9 +240,10 @@ class MicroOrdinateur():
         self.cpu.regP = 0x0000
         self.bus.mode = MODE.END
         # On exécute.
-        self.tick() # Thread safe.
+        self.tick()  # Thread safe.
         # Retour à la normale.
         return
+
 
 class RunningClock(Thread):
 
@@ -262,7 +263,7 @@ class RunningClock(Thread):
         global clockActive
         global bus
         # On donne des coups d'horloge tant que l'horloge est active.
-        while clockActive and bus.mode <> MODE.HALT:
+        while clockActive and bus.mode != MODE.HALT:
             # On donne un coup d'horloge si l'horloge est active.
             bus.clock()
         # Fin.

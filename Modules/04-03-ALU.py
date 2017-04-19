@@ -466,7 +466,7 @@ class ALU:
             :rtype: int
 
         """
-        return int(val <> 0x0000)
+        return int(val != 0x0000)
 
 
 # Activation des doctest

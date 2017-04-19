@@ -37,11 +37,12 @@ except ImportError:
 # Redéfinition.
 MODE = modEnum.MODE
 
+
 class Bus:
     """
         class Bus
         ========================
-        
+
         Le bus système du Micro-Ordinateur a un total de 49 lignes de
         communications. Ce bus système a trois sous-bus:
         - Un bus Data (16 bits)
@@ -49,30 +50,30 @@ class Bus:
         - Un bus Control (16 bits) (aussi appelée Mode)
         En addition de ces trois sous-bus (total de 48 lignes), le bus
         système a aussi une ligne (un bit) pour l'horloge du système.
-        
-        
+
+
     """
-    
+
     def __init__(self):
         """
             Constructeur de la classe Bus.
-            
-            Le constructeur initialise les attributs de la classe bus. 
-            
+
+            Le constructeur initialise les attributs de la classe bus.
+
         """
         self._component = []  # liste des composantes de la machine
         self.data = 0x0000        # valeur sur le bus
         self.address = 0x0000      # adresse d'operation
         self.mode = MODE.END   # 0:inerte, 1:write, 2:read, 4:END, 8:RESET, 9:HALT
         return
-    
-    def register(self,component):
+
+    def register(self, component):
         """
             Fonction pour ajouter un composant.
 
             Cette fonction permet d'ajouter des elements dans la liste des composantes de l'ordinateur
             elle possede comme parametre le composant a ajouter dans la liste «component ».
-        
+
             :param component: Composant du Micro-Ordinateur à lié.
             :type component: class
 
@@ -80,7 +81,7 @@ class Bus:
         # On ajoute le composant dans la liste.
         self._component.append(component)
         return
-    
+
     def event(self):
         """
             Fonction qui appelle la fonction event() des composantes.
@@ -97,22 +98,22 @@ class Bus:
                 if i.event:
                     i.event()
         return
-    
+
     def clock(self):
         """
             Fonction qui appelle la fonction clock() des composantes.
 
-            Cette fonction contrôle le traitement et l'exécution des 
+            Cette fonction contrôle le traitement et l'exécution des
             instructions en agissant particulièrement sur le cpu. Elle
             appelle les fonctions clock() des composantes se trouvant
             dans la liste de composante.
-            
+
         """
         # On quitte la fonction si le bus n'est pas prêt à recevoir un
         # coup d'horloge.
         if self.mode == MODE.HALT:
             return
-        
+
         # En mode RESET ou END on propage le coup d'horloge.
         if self.mode == MODE.RESET or self.mode == MODE.END:
             # Si la fonction est en mode END, nous la réinitialisons en
@@ -127,6 +128,7 @@ class Bus:
                     if i.clock:
                         i.clock()
         return
+
 
 # Activation des doctest
 if __name__ == "__main__":

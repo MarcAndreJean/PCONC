@@ -61,7 +61,7 @@ class ListenerGUI:
         """
             Constructeur de la classe ListenerGUI.
 
-			Le constructeur s'occupe de lié ce composant avec la GUI.
+                        Le constructeur s'occupe de lié ce composant avec la GUI.
 
         """
         # À attacher.
@@ -85,10 +85,10 @@ class ListenerGUI:
         """
             Attache le bus au composant.
 
-			Cette fonction s'occupe de lié ce composant avec le bus.
+                        Cette fonction s'occupe de lié ce composant avec le bus.
 
-			:param bus: Composant Bus du Micro-Ordinateur.
-			:type bus: Bus
+                        :param bus: Composant Bus du Micro-Ordinateur.
+                        :type bus: Bus
         """
         # On attache le Bus.
         self.bus = bus
@@ -100,10 +100,10 @@ class ListenerGUI:
         """
             Attache le cpu au composant.
 
-			cette fonction s'occupe de lié ce composant avec le cpu.
+                        cette fonction s'occupe de lié ce composant avec le cpu.
 
-			:param bus: Composant CPU du Micro-Ordinateur.
-			:type bus: CPU
+                        :param bus: Composant CPU du Micro-Ordinateur.
+                        :type bus: CPU
 
         """
         # Attache le CPU.
@@ -123,10 +123,10 @@ class ListenerGUI:
         """
             Attache le module I/O au composant.
 
-			Cette fonction s'occupe de lié ce composant avec le module IO.
+                        Cette fonction s'occupe de lié ce composant avec le module IO.
 
-			:param bus: Composant IO du Micro-Ordinateur.
-			:type bus: IO
+                        :param bus: Composant IO du Micro-Ordinateur.
+                        :type bus: IO
         """
         # On attache le module IO.
         self.IO = io
@@ -173,42 +173,43 @@ class ListenerGUI:
 
         """
         # RegA.
-        if self.prevRegA <> self.cpu.regA:
+        if self.prevRegA != self.cpu.regA:
             self.prevRegA = self.cpu.regA
             self.gui.updateMemory("RegA", self.prevRegA)
 
         # RegB.
-        if self.prevRegB <> self.cpu.regB:
+        if self.prevRegB != self.cpu.regB:
             self.prevRegB = self.cpu.regB
             self.gui.updateMemory("RegB", self.prevRegB)
 
         # RegC.
-        if self.prevRegC <> self.cpu.regC:
+        if self.prevRegC != self.cpu.regC:
             self.prevRegC = self.cpu.regC
             self.gui.updateMemory("RegC", self.prevRegC)
 
         # RegD.
-        if self.prevRegD <> self.cpu.regD:
+        if self.prevRegD != self.cpu.regD:
             self.prevRegD = self.cpu.regD
             self.gui.updateMemory("RegD", self.prevRegD)
 
         # RegP.
-        if self.prevRegP <> self.cpu.regP:
+        if self.prevRegP != self.cpu.regP:
             self.prevRegP = self.cpu.regP
             self.gui.updateMemory("RegP", self.prevRegP)
 
         # RegI.
-        if self.prevRegI <> self.cpu.regI:
+        if self.prevRegI != self.cpu.regI:
             self.prevRegI = self.cpu.regI
             self.gui.updateMemory("RegI", self.prevRegI)
 
         # RegS.
-        if self.prevRegS <> self.cpu.regS:
+        if self.prevRegS != self.cpu.regS:
             self.prevRegS = self.cpu.regS
             self.gui.updateMemory("RegS", self.prevRegS)
 
         # Fin.
         return
+
 
 # Activation des doctest
 if __name__ == "__main__":

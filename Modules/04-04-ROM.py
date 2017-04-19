@@ -61,19 +61,19 @@ class ROM:
         """
             Constructeur de la classe ROM.
 
-			Le constructeur s'occupe d'initialiser la mémoire et lie
-			ce composant avec le bus.
+                        Le constructeur s'occupe d'initialiser la mémoire et lie
+                        ce composant avec le bus.
 
-			:param bus: Composant Bus du Micro-Ordinateur.
-			:type bus: Bus
+                        :param bus: Composant Bus du Micro-Ordinateur.
+                        :type bus: Bus
 
         """
         # Bus.
         self.bus = bus
         self.bus.register(self)
 
-		# Tableau de int pour représenter la mémoire.
-        self._data = [0]*(0x40FB + 1)
+        # Tableau de int pour représenter la mémoire.
+        self._data = [0] * (0x40FB + 1)
         return
 
     def event(self):
@@ -140,6 +140,7 @@ class ROM:
                 self._data[address] = 0x0000
         # Fin.
         return
+
 
 # Activation des doctest
 if __name__ == "__main__":

@@ -58,19 +58,19 @@ class RAM:
         """
             Constructeur de la classe RAM.
 
-			Le constructeur s'occupe d'initialiser la mémoire et lie
-			ce composant avec le bus.
+                        Le constructeur s'occupe d'initialiser la mémoire et lie
+                        ce composant avec le bus.
 
-			:param bus: Composant Bus du Micro-Ordinateur.
-			:type bus: Bus
+                        :param bus: Composant Bus du Micro-Ordinateur.
+                        :type bus: Bus
 
         """
         # Bus.
         self.bus = bus
         self.bus.register(self)
 
-		# Tableau de int pour représenter la mémoire.
-        self._data = [0]*(0x7FFF + 1)
+        # Tableau de int pour représenter la mémoire.
+        self._data = [0] * (0x7FFF + 1)
         return
 
     def event(self):
@@ -107,7 +107,7 @@ class RAM:
         """
         # On réinitialise la mémoire si le bus est en mode reset.
         if self.bus.mode == MODE.RESET:
-            for i in range (0, 0x7FFF + 1):
+            for i in range(0, 0x7FFF + 1):
                 self._data[i] = 0x0000
         # Fin de la fonction.
         return

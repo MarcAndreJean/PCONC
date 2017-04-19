@@ -43,6 +43,7 @@ OPCODE = modEnum.OPCODE
 ADRESSAGE = modEnum.ADRESSAGE
 REGISTRE = modEnum.REGISTRE
 
+
 def compile(code):
     """
         Fonction central pour la compilation du code assembleur.
@@ -310,7 +311,8 @@ def __compileEx(opcode, valg='', vald=''):
             # Mode d'adressage en mode « Argument est une adresse ».
             _16bitsLeft |= ADRESSAGE.ADDR
         else:
-            # Mode d'adressage en mode « Argument est une adresse vers un registre ».
+            # Mode d'adressage en mode « Argument est une adresse vers un
+            # registre ».
             _16bitsLeft |= ADRESSAGE.ADDR_OF_REG
     # Si l'OPCODE a une adresse dans les bits droits
     elif {OPCODE.JMP: True, OPCODE.JMZ: True,
