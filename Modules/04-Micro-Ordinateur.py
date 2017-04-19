@@ -32,16 +32,25 @@ __status__ = "production"
 
 # Importation des modules nécessaires.
 try:
+    modEnum = __import__("05-Enum")
     modBus = __import__("04-01-Bus")
     modCPU = __import__("04-02-CPU")
-    modMemoire = __import__("04-04-Memoire")
+    modROM = __import__("04-04-ROM")
+    modIO = __import__("04-05-IO")
+    modRAM = __import__("04-06-RAM")
 except ImportError:
     import importlib
+    modEnum = importlib.import_module("Modules.05-Enum")
     modBus = importlib.import_module("Modules.04-01-Bus")
     modCPU = importlib.import_module("Modules.04-02-CPU")
-    modMemoire = importlib.import_module("Modules.04-04-Memoire")
+    modROM = importlib.import_module("Modules.04-04-ROM")
+    modIO = importlib.import_module("Modules.04-05-IO")
+    modRAM = importlib.import_module("Modules.04-06-RAM")
+# Redéfinition.
+MODE = modEnum.MODE
 
 from threading import Thread
+from threading import Lock
 
 
 class MicroOrdinateur():
@@ -55,9 +64,9 @@ class MicroOrdinateur():
         >>> test = MicroOrdinateur()
 
         ..note: L'horloge est intégré au micro-ordinateur. La fonction
-                tick() et toggleClock() fait appel à fonction clock()
-                du Bus dans un Thread pour permettre une utilisation
-                asynchrone du micro-ordinateur et de la GUI.
+                tick() et toggleClock() fait appel à fonction
+                _runningClock() dans un Thread pour permettre une
+                utilisation asynchrone du micro-ordinateur et de la GUI.
 
     """
 
@@ -77,21 +86,34 @@ class MicroOrdinateur():
                     méthode nommée event() et une méthode nommée clock().
 
         """
+        global clockActive
+        global bus
+        clockActive = False
+        self.clock = False
         # État de la Clock.
-        self.clockActive = False
+        self.lock = Lock()
         self.clockThread = None
         # Création du bus.
         self.bus = modBus.Bus()
-        # On register le micro-ordinateur pour l'horloge.
-        self.bus.register(self)
+        bus = self.bus
         # Création des composants de base du Micro-Ordinateur.
         self.cpu = modCPU.CPU(self.bus)
-        self.memoire = modMemoire.CPU(self.bus)
+        self.rom = modROM.ROM(self.bus)
+        self.io = modIO.IO(self.bus)
+        self.ram = modRAM.RAM(self.bus)
         # Attachement des composants supplémentaires (s'il y a lieu).
         self.xtracomp = extracomponents
-        if extracomponent is not None and len(extracomponents) > 0:
-            for xcomp in extracomponents:
-                self.bus.register(xcomp)
+        if self.xtracomp is not None and len(self.xtracomp) > 0:
+            for xcomp in self.xtracomp:
+                # On attache le bus.
+                if xcomp.attachBus:
+                    xcomp.attachBus(self.bus)
+                # On attache le CPU.
+                if xcomp.attachCPU:
+                    xcomp.attachCPU(self.cpu)
+                # On attache le module IO.
+                if xcomp.attachIO:
+                    xcomp.attachIO(self.io)
         # Fin de __init__.
         return
 
@@ -113,7 +135,7 @@ class MicroOrdinateur():
         """
         # On réinitialise le micro-ordinateur.
         self.reset()
-        self.memoire.uploadProgram(bytecode)
+        self.rom.uploadProgram(bytecode)
         return
 
     def reset(self):
@@ -127,17 +149,13 @@ class MicroOrdinateur():
             :example:
             >>> test = MicroOrdinateur()
             >>> test.reset()
-            >>> test.memoire.getMemory(0xFFFF) == 0x0000
-            True
 
         """
-        # On s'assure que le clock n'est pas en marche.
-        self.clockActive = False
-        if clockThread is not None and clockThread.isAlive():
-            clockThread.join()
-        # On réinitialise les composants de base.
-        self.bus.reset()
-        # Fin de la fonction.
+        # On reset le bus et les éléments.
+        self.bus.mode = MODE.RESET
+        self.tick() # Thread safe.
+        # Retour à la normale.
+        self.bus.mode = MODE.END
         return
 
     def tick(self):
@@ -153,16 +171,13 @@ class MicroOrdinateur():
             >>> test.tick()
 
         """
-        # Nous créons un Thread anonyme puisqu'il mourra après l'appel
-        # de bus.clock().
-        if not clockActive:
-            # Si le thread n'a pas terminé on attends au moins
-            # sa terminaison.
-            if clockThread is not None and clockThread.isAlive():
-                clockThread.join()
-            # On crée le thread.
-            self.clockThread = Thread(target=self.bus.clock)
-            self.clockThread.start()
+        # On essaie d'acquérir le lock.
+        if self.lock.acquire(False):
+            # On donne un coup d'horloge.
+            self.bus.clock()
+            # Fin de l'utilisation du lock.
+            self.lock.release()
+        # Fin.
         return
 
     def toggleClock(self):
@@ -174,39 +189,83 @@ class MicroOrdinateur():
 
             :example:
             >>> test = MicroOrdinateur()
-            >>> test.tick()
-            
+            >>> test.toggleClock()
+
         """
+        global clockActive
         # Nous changons la valeur d'état du clock.
-        self.clockActive = not self.clockActive
+        clockActive = not clockActive
         # Si l'état est maintenant actif pour la clock, nous recréons
         # thread pour celui-ci.
         if clockActive:
+            # On obtient le lock peu importe le temps.
+            self.lock.acquire()
             # Si le thread n'a pas terminé on attends au moins
             # sa terminaison.
-            if clockThread is not None and clockThread.isAlive():
-                clockThread.join()
             # On crée le thread.
-            self.clockThread = Thread(target=self.bus.clock)
+            self.clockThread = RunningClock()
             self.clockThread.start()
+        else:
+            # On attends que le Thread se termine.
+            self.clockThread.join()
+            # Fin de l'utilisation du lock.
+            self.lock.release()
+        # Fin.
         return
 
-    def event():
+    def execute(self, bytecode):
         """
-            Event pour le clock.
+            Fonction qui exécute une simple ligne de commande.
 
-            Event pour le clock. Si un OPCODE a terminé ces «computations»
-            et que le bus est maintenant en arrêt (en attente d'un nouveau
-            coup d'horloge), et bien nous lui donnons un nouveau coup
-            d'horloge.
+            Cette fonction exécute une simple ligne de commande. Elle
+            utilise le bytecode donné en argument.
+
+            :param bytecode: Code à exécuter.
+            :type bytecode: int[] (16 bits)
+
+        """
+        # On upload le code.
+        if len(bytecode) > 0:
+            self.bus.mode = MODE.WRITE
+            self.bus.address = 0x0000
+            self.bus.data = bytecode[0]
+            self.bus.event()
+            if len(bytecode) > 1:
+                self.bus.mode = MODE.WRITE
+                self.bus.address = 0x0001
+                self.bus.data = bytecode[1]
+                self.bus.event()
+
+        # On réinitialise le bus et le program counter.
+        self.cpu.regP = 0x0000
+        self.bus.mode = MODE.END
+        # On exécute.
+        self.tick() # Thread safe.
+        # Retour à la normale.
+        return
+
+class RunningClock(Thread):
+
+    def run(self):
+        """
+            Fonction thread pour le clock.
+
+            Fonction thread pour le clock. Si un OPCODE a terminé ces
+            «computations» et que le bus est maintenant en arrêt (en
+            attente d'un nouveau coup d'horloge), et bien nous lui donnons
+            un nouveau coup d'horloge.
 
            ..note: La fonction ne donne aucun coup d'horloge si clockActive
                    est devenu inactif.
 
         """
-        # On donne un coup d'horloge si l'horloge est active.
-        if clockActive:
-            self.bus.clock()
+        global clockActive
+        global bus
+        # On donne des coups d'horloge tant que l'horloge est active.
+        while clockActive and bus.mode <> MODE.HALT:
+            # On donne un coup d'horloge si l'horloge est active.
+            bus.clock()
+        # Fin.
         return
 
 

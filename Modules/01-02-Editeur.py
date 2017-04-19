@@ -245,6 +245,7 @@ class VueEditeur(Frame):
         code = modFunctEditor.loadTextCode(info)
         self.txtConsoleInput.delete("1.0", END)
         self.txtConsoleInput.insert(END, code)
+        self.statusBar.setText("Code charger.")
         # Fin callbackLoad.
         return
 

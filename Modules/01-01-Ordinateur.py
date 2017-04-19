@@ -34,11 +34,13 @@ try:
     modFunctEditor = __import__("02-FonctionEditeur")
     modComputer = __import__("04-Micro-Ordinateur")
     modCompiler = __import__("03-Compileur")
+    modListener = __import__("06-ListenerGUI")
 except ImportError:
     import importlib
     modFunctEditor = importlib.import_module("Modules.02-FonctionEditeur")
     modComputer = importlib.import_module("Modules.04-Micro-Ordinateur")
     modCompiler = importlib.import_module("Modules.03-Compileur")
+    modListener = importlib.import_module("Modules.06-ListenerGUI")
 
 # Importation de Tkinter selon la version de Python.
 # Python 2 seulement:
@@ -46,11 +48,13 @@ try:
     from Tkinter import *
     import ttk as ttk
     import tkFileDialog as fileDialog
+    import tkFont
 # Python 2 et 3 (Python 2 après ''pip install future''):
 except ImportError:
     from tkinter import *
     import tkinter.ttk as ttk
     import tkinter.filedialog as fileDialog
+    import tkFont
 
 
 def __enum(**enums):
@@ -68,6 +72,25 @@ def __enum(**enums):
 # NORMAL = Utilisation avec l'application.
 # LIGNECOMMANDE = Utilisation en ligne de commande.
 TypeUse = __enum(NORMAL=1, LIGNECOMMANDE=2)
+
+intTOascii = {0x0030 : '0', 0x0031 : '1', 0x0032 : '2', 0x0033 : '3',
+              0x0034 : '4', 0x0035 : '5', 0x0036 : '6', 0x0037 : '7',
+              0x0038 : '8', 0x0039 : '9',
+              0x0041 : 'A', 0x0042 : 'B', 0x0043 : 'C', 0x0044 : 'D',
+              0x0045 : 'E', 0x0046 : 'F', 0x0047 : 'G', 0x0048 : 'H',
+              0x0049 : 'I', 0x004A : 'J', 0x004B : 'K', 0x004C : 'L',
+              0x004D : 'M', 0x004E : 'N', 0x004F : 'O', 0x0050 : 'P',
+              0x0051 : 'Q', 0x0052 : 'R', 0x0053 : 'S', 0x0054 : 'T',
+              0x0055 : 'U', 0x0056 : 'V', 0x0057 : 'W', 0x0058 : 'X',
+              0x0059 : 'Y', 0x005A : 'Z',
+              0x0061 : 'a', 0x0062 : 'b', 0x0063 : 'c', 0x0064 : 'd',
+              0x0065 : 'e', 0x0066 : 'f', 0x0067 : 'g', 0x0068 : 'h',
+              0x0069 : 'i', 0x006A : 'j', 0x006B : 'k', 0x006C : 'l',
+              0x006D : 'm', 0x006E : 'n', 0x006F : 'o', 0x0070 : 'p',
+              0x0071 : 'q', 0x0072 : 'r', 0x0073 : 's', 0x0074 : 't',
+              0x0075 : 'u', 0x0076 : 'v', 0x0077 : 'w', 0x0078 : 'x',
+              0x0079 : 'y', 0x007A : 'z',
+              0x000A : ' ', 0x0020 : ' '}
 
 
 class VueOrdinateur(Frame):
@@ -116,7 +139,8 @@ class VueOrdinateur(Frame):
 
         """
         # Crée un Micro-Ordinateur pour cette interface
-        self.computer = modComputer.MicroOrdinateur()
+        self.computer = modComputer.MicroOrdinateur(
+            [modListener.ListenerGUI(self)])
         self.boolClock = False
 
         # Initialise le Frame de l'instance.
@@ -171,48 +195,155 @@ class VueOrdinateur(Frame):
         # End
 
         # --Label.
-        self.frameCout = Frame(self)
-        self.labelCout = ttk.Label(self.frameCout,
-                                   text="Console Output")
+        self.frameCinCout = Frame(self)
+        self.labelCout = ttk.Label(self.frameCinCout,
+                                   text="Console Output",
+                                   anchor=SW)
         self.txtConsoleOutput = ttk.Label(
-            self.frameCout,
+            self.frameCinCout,
+            font= tkFont.Font(family='Consolas', size=8),
             textvariable=self.txtvarConsoleOutput,
             width=0,
             relief=GROOVE,
             background="white",
-            anchor=SW)
+            anchor=NW)
         self.labelCout.pack(fill=X, padx=3, pady=5)
-        self.txtConsoleOutput.pack(fill=BOTH, padx=3, pady=5, expand=True)
-        self.frameCout.grid(column=1, row=0, rowspan=3, sticky="NSWE")
+        self.txtConsoleOutput.pack(fill=X, padx=3, pady=5)
+        self.frameCinCout.grid(column=1, row=0, rowspan=3, sticky="NSWE")
+        # ----Initialise label.text
+        self.stringOuput = ''
+        sentence = '........................................' \
+                   '........................................'
+        for y in range(24):
+            self.stringOuput += sentence + '\n'
+        self.stringOuput += sentence
+        self.txtvarConsoleOutput.set(self.stringOuput)
+
         # --Text.
-        self.frameCin = Frame(self)
-        self.labelCin = ttk.Label(self.frameCin,
+        self.labelCin = ttk.Label(self.frameCinCout,
                                   text="Console Input")
 
-        self.innerFrameCin = ttk.Frame(self.frameCin, relief=SUNKEN)
-        self.txtConsoleInput = Text(self.innerFrameCin, width=0, relief=FLAT)
+        self.innerFrameCin = ttk.Frame(self.frameCinCout)
+        self.scllbrCin = ttk.Scrollbar(self.innerFrameCin)
+        self.txtConsoleInput = Text(self.innerFrameCin, width=0, bd=2, height=0,
+                                    yscrollcommand=self.scllbrCin.set)
+        self.scllbrCin.config(command=self.txtConsoleInput.yview)
         self.labelCin.pack(fill=X, padx=3, pady=5)
         self.innerFrameCin.pack(fill=BOTH,
                                 padx=3, pady=5, expand=True)
-        self.txtConsoleInput.pack(fill=BOTH, padx=3, pady=3, expand=True)
-        self.frameCin.grid(column=2, row=0, rowspan=3, sticky="NSWE")
+        self.txtConsoleInput.pack(side=LEFT, fill=BOTH, padx=3, pady=3, expand=True)
+        self.scllbrCin.pack(side=RIGHT, fill=Y)
         # --Notebook.
         self.tabMemoireChooser = ttk.Notebook(self, width=0)
-        self.tabMemoireChooser.grid(column=3, row=0, rowspan=3,
+        self.tabMemoireChooser.grid(column=2, row=0, rowspan=3,
                                     sticky="NSWE",
                                     padx=3, pady=8)
         # --Listbox.
-        self.listMemoireRAM = Listbox(self.tabMemoireChooser,
-                                      state=DISABLED, relief=FLAT)
-        self.listMemoireROM = Listbox(self.tabMemoireChooser,
-                                      state=DISABLED, relief=FLAT)
-        self.listMemoireIO = Listbox(self.tabMemoireChooser,
-                                     state=DISABLED, relief=FLAT)
+        # ----Frame pour Listbox.
+        self.frameMemrom = Frame(self.tabMemoireChooser)
+        self.frameMemram = Frame(self.tabMemoireChooser)
+        self.frameMemio = Frame(self.tabMemoireChooser)
+        self.frameMemreg = Frame(self.tabMemoireChooser)
+        # ----Scrollbar pour Listbox.
+        self.scllbrMemrom = ttk.Scrollbar(self.frameMemrom)
+        self.scllbrMemram = ttk.Scrollbar(self.frameMemram)
+        self.scllbrMemio = ttk.Scrollbar(self.frameMemio)
+        self.scllbrMemreg = ttk.Scrollbar(self.frameMemreg)
+        # ----ListBox.
+        self.listMemoireROM = ttk.Treeview(self.frameMemrom,
+                                           show="headings",
+                                           columns=("one", "two", "three"),
+                                           yscrollcommand=self.scllbrMemrom.set)
+        self.listMemoireRAM = ttk.Treeview(self.frameMemram,
+                                           show="headings",
+                                           columns=("one", "two", "three"),
+                                           yscrollcommand=self.scllbrMemram.set)
+        self.listMemoireIO = ttk.Treeview(self.frameMemio,
+                                          show="headings",
+                                          columns=("one", "two", "three"),
+                                           yscrollcommand=self.scllbrMemio.set)
+        self.listMemoireREG = ttk.Treeview(self.frameMemreg,
+                                           show="headings",
+                                           columns=("one", "two", "three"),
+                                           yscrollcommand=self.scllbrMemreg.set)
+        # Création des colonnes.
+        for listMemoire in [self.listMemoireROM, self.listMemoireRAM,
+                            self.listMemoireIO, self.listMemoireREG]:
+            listMemoire.column("one", width=50 )
+            listMemoire.column("two", width=50)
+            listMemoire.column("three", width=50)
+            listMemoire.heading("one", text="Adresse")
+            listMemoire.heading("two", text="Valeur (hex)")
+            listMemoire.heading("three", text="Valeur (dec)")
+        # Insertion des éléments.
+        # --ROM.
+        for i in range(0, 0x40FB + 1):
+            self.listMemoireROM.insert("" , 'end', iid=str(i),
+                                       values=('0x' + format(i, '#06X')[2:],
+                                               "0x0000","0"))
+        # --RAM.
+        for i in range(0x8000, 0xFFFF + 1):
+            self.listMemoireRAM.insert("" , 'end', iid=str(i),
+                                       values=('0x' + format(i, '#06X')[2:],
+                                               "0x0000","0"))
+        # --IO.
+        for i in range(0x40FC, 0x7FFF + 1):
+            self.listMemoireIO.insert("" , 'end', iid=str(i),
+                                      values=('0x' + format(i, '#06X')[2:],
+                                              "0x0000","0"))
+        # --REG.
+        self.listMemoireREG.insert("" , 'end', iid="RegA",
+                                   values=("RegA",
+                                           "0x0000","0"))
+        self.listMemoireREG.insert("" , 'end', iid="RegB",
+                                   values=("RegB",
+                                           "0x0000","0"))
+        self.listMemoireREG.insert("" , 'end', iid="RegC",
+                                   values=("RegC",
+                                           "0x0000","0"))
+        self.listMemoireREG.insert("" , 'end', iid="RegD",
+                                   values=("RegD",
+                                           "0x0000","0"))
+        self.listMemoireREG.insert("" , 'end', iid="RegP",
+                                   values=("RegP",
+                                           "0x0000","0"))
+        self.listMemoireREG.insert("" , 'end', iid="RegI",
+                                   values=("RegI",
+                                           "0x0000","0"))
+        self.listMemoireREG.insert("" , 'end', iid="RegS",
+                                   values=("RegS",
+                                           "0x0000","0"))
+        # Liaison scrollbar et tree.
+        self.scllbrMemrom.config(command=self.listMemoireROM.yview)
+        self.scllbrMemram.config(command=self.listMemoireRAM.yview)
+        self.scllbrMemio.config(command=self.listMemoireIO.yview)
+        self.scllbrMemreg.config(command=self.listMemoireREG.yview)
+        # Placement du scrollbar et tree dans le frame.
+        # --rom.
+        self.scllbrMemrom.pack(side="right", fill="y")
+        self.listMemoireROM.pack(side="left", fill=BOTH, expand=True)
+        # --ram.
+        self.scllbrMemram.pack(side="right", fill="y")
+        self.listMemoireRAM.pack(side="left", fill=BOTH, expand=True)
+        # --io.
+        self.scllbrMemio.pack(side="right", fill="y")
+        self.listMemoireIO.pack(side="left", fill=BOTH, expand=True)
+        # --reg.
+        self.scllbrMemreg.pack(side="right", fill="y")
+        self.listMemoireREG.pack(side="left", fill=BOTH, expand=True)
+        # --Frame.
+        self.frameMemrom.pack(fill=BOTH, expand=True)
+        self.frameMemio.pack(fill=BOTH, expand=True)
+        self.frameMemram.pack(fill=BOTH, expand=True)
+        self.frameMemreg.pack(fill=BOTH, expand=True)
 
         # Insertion des listes dans le TAB mémoire.
-        self.tabMemoireChooser.add(self.listMemoireRAM, text="    RAM    ")
-        self.tabMemoireChooser.add(self.listMemoireROM, text="    ROM    ")
-        self.tabMemoireChooser.add(self.listMemoireIO, text="      IO      ")
+        self.tabMemoireChooser.add(self.frameMemrom, text="    ROM    ")
+        self.tabMemoireChooser.add(self.frameMemio,
+                                   text="      IO      ")
+        self.tabMemoireChooser.add(self.frameMemram, text="    RAM    ")
+        self.tabMemoireChooser.add(self.frameMemreg, text="    REG    ")
+
 
         # Création du Grid inclut dans le parent.
         # Fixation d'un "poids" pour chacune des cellules, pour que les
@@ -220,11 +351,11 @@ class VueOrdinateur(Frame):
         for y in range(3):
             self.grid_rowconfigure(y, minsize=100, weight=1)
         if typeUse == TypeUse.NORMAL:
-            for x in range(1, 4):
+            for x in range(1, 3):
                 self.grid_columnconfigure(x, minsize=200, weight=2)
             self.grid_columnconfigure(0, minsize=100, weight=1)
         else:
-            for x in range(4):
+            for x in range(3):
                 self.grid_columnconfigure(x, minsize=200, weight=2)
 
         # Liaison des évènements.
@@ -235,8 +366,15 @@ class VueOrdinateur(Frame):
             self.butClock.configure(command=self.__callbackClock)
         else:
             self.entryCMD.bind('<Return>', self.__callbackCMD)
+        self.bind("<Key>", self.__callbackKey)
 
         # Fin de __init__.
+        return
+
+    def __callbackKey(self, event):
+        """
+        """
+        print(event.char)
         return
 
     def __callbackCMD(self, event):
@@ -259,6 +397,13 @@ class VueOrdinateur(Frame):
         result = modCompiler.compile(self.entryCMD.get())
         # Si la compilation est un succès on l'exécute.
         if result[0]:
+            self.txtvarCMDhisto.set(
+                self.txtvarCMDhisto.get() + self.entryCMD.get() + '\n')
+            temptext = str(self.txtvarCMDhisto.get()).splitlines()
+            # Suppression des lignes excédentaires.
+            if len(temptext) > 33:
+                self.txtvarCMDhisto.set(
+                    str(self.txtvarCMDhisto.get())[len(temptext[0]) + 1:])
             self.entryCMD.delete(0, END)
             self.computer.execute(result[1])
         # Sinon on avertit l'utilisateur de l'erreur.
@@ -293,9 +438,29 @@ class VueOrdinateur(Frame):
             return
         # On charge ce fichier.
         code = modFunctEditor.loadByteCode(info)
+
+        # On mets à jour la liste de ROM.
+        # On parcourt toutes les adresses de la mémoire ROM.
+        for address in range(min(len(code), 0x40FB + 1)):
+            # On transfert le bytecode[address] à l'adresse.
+            self.listMemoireROM.item(str(address),
+                                     values=('0x' + format(address, '#06X')[2:],
+                                             format(code[address], '#06x'),
+                                             str(code[address])))
+        # Si le bytecode est plus petit que la taille max de la mémoire
+        # ROM, on mets dans zéro pour le reste des cases.
+        if len(code) < 0x40FB + 1:
+            # On attribut des zéros pour ces cases.
+            for address in range(len(code), 0x40FB + 1):
+                self.listMemoireROM.item(str(address),
+                                         values=('0x' + format(address, '#06X')[2:],
+                                                 format(0x0000, '#06x'),
+                                                 str(0x0000)))
+
         # On appelle la fonction approprié pour charger le code dans
         # le micro-ordinateur.
         self.computer.load(code)
+
         # Fin de callbackCharger.
         return
 
@@ -345,77 +510,76 @@ class VueOrdinateur(Frame):
         # On appelle la fonction approprié.
         self.computer.toggleClock()
         self.boolClock = not self.boolClock
-        if (self.boolClock):
+        if self.boolClock:
             self.txtvarToggleClock.set("Arrêter l'horloge")
         else:
             self.txtvarToggleClock.set("Démarrer l'horloge")
         # Fin de callbackClock.
         return
 
-    def getListRAM(self):
+    def updateMemory(self, address, value):
         """
-            Retourne le widget liste de la RAM.
+            Mets à jour la GUI pour l'adresse «address».
 
-            :return: Retourne le widget liste de la RAM.
-            :rtype: Listbox
+            Cette fonction est appelé lorsqu'il y a un changement dans la
+            mémoire du micro-ordinateur. Dépendamment de la valeur de
+            l'adresse en argument (address), la fonction fera les
+            changements en conséquent.
 
             :example:
             >>> test = VueOrdinateur(None)
-            >>> isinstance(test.getListRAM(), Listbox)
-            True
+            >>> test.updateMemory(0, 14)
+
+            :param address: Adresse qui a été mise à jour.
+            :param address: int (16 bits)
+            :param value: Valeur à cette adresse.
+            :param value: int (16 bits)
 
         """
-        return self.listMemoireRAM
+        # Registre
+        if isinstance(address, str):
+            self.listMemoireREG.item(str(address),
+                                     values=(address,
+                                             format(value, '#06x'),
+                                             str(value)))
+            self.listMemoireREG.update_idletasks()
+            self.listMemoireREG.update()
+        # Espace ROM
+        elif address <= 0x40FB:
+            self.listMemoireROM.item(str(address),
+                                     values=('0x' + format(address, '#06X')[2:],
+                                             format(value, '#06x'),
+                                             str(value)))
+            self.listMemoireROM.update_idletasks()
+            self.listMemoireROM.update()
+        # Espace IO
+        elif address <= 0x7FFF:
+            self.listMemoireIO.item(str(address),
+                                    values=('0x' + format(address, '#06X')[2:],
+                                            format(value, '#06x'),
+                                            str(value)))
+            # Screen : Ouput
+            if address >= 0x41FC and address <= 0x49CB:
+                global intTOascii
+                self.stringOuput = self.stringOuput[:address - 0x41FC] + \
+                                   str(intTOascii.get(value, '.')) + \
+                                   self.stringOuput[1 + address - 0x41FC:]
+                self.txtvarConsoleOutput.set(self.stringOuput)
+            # Keyboard
+            elif address >= 0x40FC and address <= 0x41FB:
+                pass
+            self.listMemoireIO.update_idletasks()
+            self.listMemoireIO.update()
+        # Espace RAM
+        elif address <= 0xFFFF:
+            self.listMemoireRAM.item(str(address),
+                                     values=('0x' + format(address, '#06X')[2:],
+                                             format(value, '#06x'),
+                                             str(value)))
+            self.listMemoireRAM.update_idletasks()
+            self.listMemoireRAM.update()
 
-    def getListROM(self):
-        """
-            Retourne le widget liste de la ROM.
-
-            :return: Retourne le widget liste de la ROM.
-            :rtype: Listbox
-
-            :example:
-            >>> test = VueOrdinateur(None)
-            >>> isinstance(test.getListROM(), Listbox)
-            True
-
-        """
-        return self.listMemoireROM
-
-    def getListIO(self):
-        """
-            Retourne le widget liste des IO.
-
-            :return: Retourne le widget liste des IO.
-            :rtype: Listbox
-
-            :example:
-            >>> test = VueOrdinateur(None)
-            >>> isinstance(test.getListIO(), Listbox)
-            True
-
-        """
-        return self.listMemoireIO
-
-    def appendConsoleOutput(self, output):
-        """
-            Ajoute à la fin du « log » une nouvelle sortie.
-
-            Cette fonction ajoute une nouvelle ligne de texte (à la fin)
-            pour l'historique de la console de sortie du micro-ordinateur.
-
-            :param output: Texte à ajouter à la fin de la console.
-            :type output: str
-
-            :example:
-            >>> test = VueOrdinateur(None)
-            >>> test.appendConsoleOutput("test")
-
-
-        """
-        self.txtvarConsoleOutput.set(
-            self.txtvarConsoleOutput.get() + '\n' + output)
-        # Fin de appendConsoleOutput.
+        # Fin.
         return
 
 

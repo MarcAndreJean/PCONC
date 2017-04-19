@@ -115,7 +115,7 @@ def compile(code):
             vald = words[2]
         # Sinon, il s'agit d'une ligne illégale.
         else:
-            [False, "Ligne " + str(linenum) + " : ligne illégale."]
+            return [False, "Ligne " + str(linenum) + " : ligne illégale."]
 
         # On essaie de compiler la ligne.
         try:
@@ -300,8 +300,6 @@ def __compileEx(opcode, valg='', vald=''):
         _16bitsRight = stringToInt(vald)
         if _16bitsRight > 0xFFFF:
             raise CompilationErreur("INVALID RIGHT VALUE")
-        # Ajoute le mode d'adressage en mode « Argument est une registre ».
-        _16bitsLeft |= ADRESSAGE.IMMEDIATE
     # Si l'OPCODE a une adresse* dans les bits droits
     elif {OPCODE.LD: True, OPCODE.ST: True}.get(_16bitsOPCODE, False):
         _16bitsRight = dictREG.get(vald, None)
@@ -309,8 +307,11 @@ def __compileEx(opcode, valg='', vald=''):
             _16bitsRight = stringToInt(vald)
             if _16bitsRight > 0xFFFF:
                 raise CompilationErreur("INVALID RIGHT ARG")
-            # Mode d'adressage en mode « Argument est une ADRESSE ».
-            _16bitsLeft |= ADRESSAGE.DIRECT
+            # Mode d'adressage en mode « Argument est une adresse ».
+            _16bitsLeft |= ADRESSAGE.ADDR
+        else:
+            # Mode d'adressage en mode « Argument est une adresse vers un registre ».
+            _16bitsLeft |= ADRESSAGE.ADDR_OF_REG
     # Si l'OPCODE a une adresse dans les bits droits
     elif {OPCODE.JMP: True, OPCODE.JMZ: True,
           OPCODE.JMO: True, OPCODE.JMC: True,
@@ -319,7 +320,7 @@ def __compileEx(opcode, valg='', vald=''):
         if _16bitsRight > 0xFFFF:
             raise CompilationErreur("INVALID RIGHT ADDRESS")
         # Ajoute le mode d'adressage en mode « Argument est une ADRESSE ».
-        _16bitsLeft |= ADRESSAGE.DIRECT
+        _16bitsLeft |= ADRESSAGE.ADDR
     elif OPCODE.DTA == _16bitsOPCODE:
         _16bitsRight = stringToInt(vald)
 
