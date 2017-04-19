@@ -31,12 +31,14 @@ __status__ = "Production"
 
 # Importation des modules nécessaires.
 try:
+    modCin = __import__("01-05-TextCin")
     modFunctEditor = __import__("02-FonctionEditeur")
     modComputer = __import__("04-Micro-Ordinateur")
     modCompiler = __import__("03-Compileur")
     modListener = __import__("06-ListenerGUI")
 except ImportError:
     import importlib
+    modCin = importlib.import_module("Modules.01-05-TextCin")
     modFunctEditor = importlib.import_module("Modules.02-FonctionEditeur")
     modComputer = importlib.import_module("Modules.04-Micro-Ordinateur")
     modCompiler = importlib.import_module("Modules.03-Compileur")
@@ -225,13 +227,15 @@ class VueOrdinateur(Frame):
 
         self.innerFrameCin = ttk.Frame(self.frameCinCout)
         self.scllbrCin = ttk.Scrollbar(self.innerFrameCin)
-        self.txtConsoleInput = Text(self.innerFrameCin, width=0, bd=2, height=0,
+        self.txtConsoleInput = modCin.TextCin(self.innerFrameCin, width=0, bd=2,
+                                    height=0,
                                     yscrollcommand=self.scllbrCin.set)
         self.scllbrCin.config(command=self.txtConsoleInput.yview)
         self.labelCin.pack(fill=X, padx=3, pady=5)
         self.innerFrameCin.pack(fill=BOTH,
                                 padx=3, pady=5, expand=True)
-        self.txtConsoleInput.pack(side=LEFT, fill=BOTH, padx=3, pady=3, expand=True)
+        self.txtConsoleInput.pack(side=LEFT, fill=BOTH, padx=3, pady=3,
+                                  expand=True)
         self.scllbrCin.pack(side=RIGHT, fill=Y)
         # --Notebook.
         self.tabMemoireChooser = ttk.Notebook(self, width=0)
@@ -439,6 +443,14 @@ class VueOrdinateur(Frame):
         # On charge ce fichier.
         code = modFunctEditor.loadByteCode(info)
 
+        # On réinitialise l'affichage.
+        # --ROM.
+        for i in range(0, 0x40FB + 1):
+            self.listMemoireROM.item(str(i),
+                                       values=('0x' + format(i, '#06X')[2:],
+                                               "0x0000","0"))
+        self.__callbackReset()
+
         # On mets à jour la liste de ROM.
         # On parcourt toutes les adresses de la mémoire ROM.
         for address in range(min(len(code), 0x40FB + 1)):
@@ -447,15 +459,6 @@ class VueOrdinateur(Frame):
                                      values=('0x' + format(address, '#06X')[2:],
                                              format(code[address], '#06x'),
                                              str(code[address])))
-        # Si le bytecode est plus petit que la taille max de la mémoire
-        # ROM, on mets dans zéro pour le reste des cases.
-        if len(code) < 0x40FB + 1:
-            # On attribut des zéros pour ces cases.
-            for address in range(len(code), 0x40FB + 1):
-                self.listMemoireROM.item(str(address),
-                                         values=('0x' + format(address, '#06X')[2:],
-                                                 format(0x0000, '#06x'),
-                                                 str(0x0000)))
 
         # On appelle la fonction approprié pour charger le code dans
         # le micro-ordinateur.
@@ -477,6 +480,30 @@ class VueOrdinateur(Frame):
         """
         # On appelle la fonction approprié.
         self.computer.reset()
+        # ----Reinitialise label.text
+        self.stringOuput = ''
+        sentence = '........................................' \
+                   '........................................'
+        for y in range(24):
+            self.stringOuput += sentence + '\n'
+        self.stringOuput += sentence
+        self.txtvarConsoleOutput.set(self.stringOuput)
+
+        # ----Reinitialise les listes.
+        # --RAM.
+        for i in range(0x8000, 0xFFFF + 1):
+            self.listMemoireRAM.item(str(i),
+                                       values=('0x' + format(i, '#06X')[2:],
+                                               "0x0000","0"))
+        # --IO.
+        for i in range(0x40FC, 0x7FFF + 1):
+            self.listMemoireIO.item(str(i),
+                                      values=('0x' + format(i, '#06X')[2:],
+                                              "0x0000","0"))
+        # --REGISTRE.
+        for curreg in ("RegA", "RegB", "RegC", "RegD", "RegP", "RegI", "RegS"):
+            self.listMemoireREG.item(curreg, values=(curreg, "0x0000","0"))
+
         # Fin de callbackReset.
         return
 

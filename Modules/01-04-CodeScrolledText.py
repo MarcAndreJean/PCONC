@@ -169,7 +169,8 @@ class TextAdvanced(Text):
 
         # Création des évènements pour l'insertion ou la supression de
         # ligne dans la zone de texte, ou lorsque le texte est
-        # « scrolled ».
+        # « scrolled ». Le code en commentaire n'est pas du code Python mais
+        # du code Tcl (Tck/Tk).
         self.tk.eval('''
             proc widget_proxy {widget widget_command args} {
 

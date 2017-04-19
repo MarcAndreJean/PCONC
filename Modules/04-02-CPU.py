@@ -389,28 +389,28 @@ class CPU:
             # Si le OPCODE est JMP (résoudre l'adresse)
             if opcode == OPCODE.JMP:
                 self._readAddress()
-                self.regI = self.bus.address
+                self.regP = self.bus.address
                 self.bus.mode = MODE.END
                 return
             # Si le OPCODE est JMZ et flag ZERO ON (résoudre l'adresse)
             elif opcode == OPCODE.JMZ \
             and self.regS & STATUS.ZERO == STATUS.ZERO:
                 self._readAddress()
-                self.regI = self.bus.address
+                self.regP = self.bus.address
                 self.bus.mode = MODE.END
                 return
             # Si le OPCODE est JMO et flag CARRY ON (résoudre l'adresse)
             elif opcode == OPCODE.JMO \
             and self.regS & STATUS.CARRY == STATUS.CARRY:
                 self._readAddress()
-                self.regI = self.bus.address
+                self.regP = self.bus.address
                 self.bus.mode = MODE.END
                 return
             # Si le OPCODE est JMC et flag CND ON (résoudre l'adresse)
             elif opcode == OPCODE.JMC \
             and self.regS & STATUS.CND == STATUS.CND:
                 self._readAddress()
-                self.regI = self.bus.address
+                self.regP = self.bus.address
                 self.bus.mode = MODE.END
                 return
             # Execute : ***
