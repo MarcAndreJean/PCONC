@@ -35,6 +35,7 @@ try:
     modFunctEditor = __import__("02-FonctionEditeur")
     modComputer = __import__("04-Micro-Ordinateur")
     modCompiler = __import__("03-Compileur")
+    modEnum = __import__("05-Enum")
     modListener = __import__("06-ListenerGUI")
 except ImportError:
     import importlib
@@ -42,7 +43,11 @@ except ImportError:
     modFunctEditor = importlib.import_module("Modules.02-FonctionEditeur")
     modComputer = importlib.import_module("Modules.04-Micro-Ordinateur")
     modCompiler = importlib.import_module("Modules.03-Compileur")
+    modEnum = importlib.import_module("Modules.05-Enum")
     modListener = importlib.import_module("Modules.06-ListenerGUI")
+# Redéfinition.
+intTOascii = modEnum.intTOascii
+enum = modEnum.enum
 
 # Importation de Tkinter selon la version de Python.
 # Python 2 seulement:
@@ -59,40 +64,10 @@ except ImportError:
     import tkFont
 
 
-def __enum(**enums):
-    """
-        Création du type Enum pour le besoin de l'application.
-
-        :return: Un type Enum
-        :rtype: Enum
-
-    """
-    return type('Enum', (), enums)
-
-
 # Enum des différents types d'utilisation de la Vue Ordinateur
 # NORMAL = Utilisation avec l'application.
 # LIGNECOMMANDE = Utilisation en ligne de commande.
-TypeUse = __enum(NORMAL=1, LIGNECOMMANDE=2)
-
-intTOascii = {0x0030: '0', 0x0031: '1', 0x0032: '2', 0x0033: '3',
-              0x0034: '4', 0x0035: '5', 0x0036: '6', 0x0037: '7',
-              0x0038: '8', 0x0039: '9',
-              0x0041: 'A', 0x0042: 'B', 0x0043: 'C', 0x0044: 'D',
-              0x0045: 'E', 0x0046: 'F', 0x0047: 'G', 0x0048: 'H',
-              0x0049: 'I', 0x004A: 'J', 0x004B: 'K', 0x004C: 'L',
-              0x004D: 'M', 0x004E: 'N', 0x004F: 'O', 0x0050: 'P',
-              0x0051: 'Q', 0x0052: 'R', 0x0053: 'S', 0x0054: 'T',
-              0x0055: 'U', 0x0056: 'V', 0x0057: 'W', 0x0058: 'X',
-              0x0059: 'Y', 0x005A: 'Z',
-              0x0061: 'a', 0x0062: 'b', 0x0063: 'c', 0x0064: 'd',
-              0x0065: 'e', 0x0066: 'f', 0x0067: 'g', 0x0068: 'h',
-              0x0069: 'i', 0x006A: 'j', 0x006B: 'k', 0x006C: 'l',
-              0x006D: 'm', 0x006E: 'n', 0x006F: 'o', 0x0070: 'p',
-              0x0071: 'q', 0x0072: 'r', 0x0073: 's', 0x0074: 't',
-              0x0075: 'u', 0x0076: 'v', 0x0077: 'w', 0x0078: 'x',
-              0x0079: 'y', 0x007A: 'z',
-              0x000A: ' ', 0x0020: ' '}
+TypeUse = enum(NORMAL=1, LIGNECOMMANDE=2)
 
 
 class VueOrdinateur(Frame):
@@ -141,8 +116,8 @@ class VueOrdinateur(Frame):
 
         """
         # Crée un Micro-Ordinateur pour cette interface
-        self.computer = modComputer.MicroOrdinateur(
-            [modListener.ListenerGUI(self)])
+        self.listener = modListener.ListenerGUI(self)
+        self.computer = modComputer.MicroOrdinateur(self.listener)
         self.boolClock = False
 
         # Initialise le Frame de l'instance.
@@ -196,6 +171,7 @@ class VueOrdinateur(Frame):
             self.frameCMD.grid(column=0, row=0, rowspan=3, sticky="NSWE")
         # End
 
+        # ___________________________________________________________________
         # --Label.
         self.frameCinCout = Frame(self)
         self.labelCout = ttk.Label(self.frameCinCout,
@@ -213,33 +189,23 @@ class VueOrdinateur(Frame):
         self.txtConsoleOutput.pack(fill=X, padx=3, pady=5)
         self.frameCinCout.grid(column=1, row=0, rowspan=3, sticky="NSWE")
         # ----Initialise label.text
-        self.stringOuput = ''
-        sentence = '........................................' \
-                   '........................................'
-        for y in range(24):
-            self.stringOuput += sentence + '\n'
-        self.stringOuput += sentence
-        self.txtvarConsoleOutput.set(self.stringOuput)
+        self.stringOutput = (('.' * 80) + '\n') * 24 + '.' * 80
+        self.txtvarConsoleOutput.set(self.stringOutput)
 
+        # ___________________________________________________________________
         # --Text.
         self.labelCin = ttk.Label(self.frameCinCout,
                                   text="Console Input")
-
-        self.innerFrameCin = ttk.Frame(self.frameCinCout)
-        self.scllbrCin = ttk.Scrollbar(self.innerFrameCin)
         self.txtConsoleInput = modCin.TextCin(
-            self.innerFrameCin,
+            self.frameCinCout,
             width=0,
             bd=2,
-            height=0,
-            yscrollcommand=self.scllbrCin.set)
-        self.scllbrCin.config(command=self.txtConsoleInput.yview)
+            height=0)
         self.labelCin.pack(fill=X, padx=3, pady=5)
-        self.innerFrameCin.pack(fill=BOTH,
-                                padx=3, pady=5, expand=True)
-        self.txtConsoleInput.pack(side=LEFT, fill=BOTH, padx=3, pady=3,
+        self.txtConsoleInput.pack(side=BOTTOM, fill=BOTH, padx=3, pady=3,
                                   expand=True)
-        self.scllbrCin.pack(side=RIGHT, fill=Y)
+
+        # ___________________________________________________________________
         # --Notebook.
         self.tabMemoireChooser = ttk.Notebook(self, width=0)
         self.tabMemoireChooser.grid(column=2, row=0, rowspan=3,
@@ -296,27 +262,10 @@ class VueOrdinateur(Frame):
                                       values=('0x' + format(i, '#06X')[2:],
                                               "0x0000", "0"))
         # --REG.
-        self.listMemoireREG.insert("", 'end', iid="RegA",
-                                   values=("RegA",
-                                           "0x0000", "0"))
-        self.listMemoireREG.insert("", 'end', iid="RegB",
-                                   values=("RegB",
-                                           "0x0000", "0"))
-        self.listMemoireREG.insert("", 'end', iid="RegC",
-                                   values=("RegC",
-                                           "0x0000", "0"))
-        self.listMemoireREG.insert("", 'end', iid="RegD",
-                                   values=("RegD",
-                                           "0x0000", "0"))
-        self.listMemoireREG.insert("", 'end', iid="RegP",
-                                   values=("RegP",
-                                           "0x0000", "0"))
-        self.listMemoireREG.insert("", 'end', iid="RegI",
-                                   values=("RegI",
-                                           "0x0000", "0"))
-        self.listMemoireREG.insert("", 'end', iid="RegS",
-                                   values=("RegS",
-                                           "0x0000", "0"))
+        for name in ["RegA", "RegB", "RegC", "RegD", "RegP", "RegI", "RegS"]:
+            self.listMemoireREG.insert("", 'end', iid=name,
+                                       values=(name,
+                                               "0x0000", "0"))
         # Liaison scrollbar et tree.
         self.scllbrMemrom.config(command=self.listMemoireROM.yview)
         self.scllbrMemram.config(command=self.listMemoireRAM.yview)
@@ -348,6 +297,7 @@ class VueOrdinateur(Frame):
         self.tabMemoireChooser.add(self.frameMemram, text="    RAM    ")
         self.tabMemoireChooser.add(self.frameMemreg, text="    REG    ")
 
+        # ___________________________________________________________________
         # Création du Grid inclut dans le parent.
         # Fixation d'un "poids" pour chacune des cellules, pour que les
         # cellules s'étire et que le «Grid» remplit l'espace requis.
@@ -361,6 +311,7 @@ class VueOrdinateur(Frame):
             for x in range(3):
                 self.grid_columnconfigure(x, minsize=200, weight=2)
 
+        # ___________________________________________________________________
         # Liaison des évènements.
         if typeUse == TypeUse.NORMAL:
             self.butCharger.configure(command=self.__callbackCharger)
@@ -369,15 +320,72 @@ class VueOrdinateur(Frame):
             self.butClock.configure(command=self.__callbackClock)
         else:
             self.entryCMD.bind('<Return>', self.__callbackCMD)
-        self.bind("<Key>", self.__callbackKey)
+        self.txtConsoleInput.bind("<Key>", self.__callbackKey)
 
         # Fin de __init__.
         return
 
+    def transfert(self, code):
+        """
+            Transfert de bytecode d'une interface externe.
+
+            Cette fonction upload le code en argument dans la ROM.
+
+            :example:
+            >>> test = VueOrdinateur()
+            >>> test.transfert([0,0])
+
+            :param code: Bytecode à charger dans la ROM.
+            :type code: int[]
+
+        """
+        # On réinitialise l'affichage.
+        # --ROM.
+        for i in range(0, 0x40FB + 1):
+            self.listMemoireROM.item(str(i),
+                                     values=('0x' + format(i, '#06X')[2:],
+                                             "0x0000", "0"))
+        self.__callbackReset()
+
+        # On mets à jour la liste de ROM.
+        # On parcourt toutes les adresses de la mémoire ROM.
+        for address in range(0, min(len(code), 0x40FB + 1)):
+            # On transfert le bytecode[address] à l'adresse.
+            self.listMemoireROM.item(str(address),
+                                     values=('0x' + format(address, '#06X')[2:],
+                                             format(code[address], '#06x'),
+                                             str(code[address])))
+
+        # On appelle la fonction approprié pour charger le code dans
+        # le micro-ordinateur.
+        self.computer.load(code)
+        # Fin.
+        return
+
     def __callbackKey(self, event):
         """
+            Callback lors de l'entrée d'une touche clavier.
+
+            Cette fonction est appelée lorsque le widget du console output à
+            le focus et qu'une touche est appuyée.
+
+            :param event: Object Event contenant la touche.
+            :type event: Event.
+
         """
-        print(event.char)
+        # Mets à jour le widget Text Console Input.
+        result = self.txtConsoleInput.refresh(event.char)
+        # Mets à jour la mémoire IO.
+        self.listener.writeKeyboardBuffer(event.char)
+        # Mets à jour le widget List.
+        self.listener.io.lockIO.acquire()
+        for i, dat in zip(range(0x40FC, 0x41FB + 1), self.listener.io.data):
+            self.listMemoireIO.item(str(i),
+                                    values=('0x' + format(i, '#06X')[2:],
+                                            format(dat, '#06x'),
+                                            dat))
+        self.listener.io.lockIO.release()
+        # Fin.
         return
 
     def __callbackCMD(self, event):
@@ -442,27 +450,8 @@ class VueOrdinateur(Frame):
         # On charge ce fichier.
         code = modFunctEditor.loadByteCode(info)
 
-        # On réinitialise l'affichage.
-        # --ROM.
-        for i in range(0, 0x40FB + 1):
-            self.listMemoireROM.item(str(i),
-                                     values=('0x' + format(i, '#06X')[2:],
-                                             "0x0000", "0"))
-        self.__callbackReset()
-
-        # On mets à jour la liste de ROM.
-        # On parcourt toutes les adresses de la mémoire ROM.
-        for address in range(min(len(code), 0x40FB + 1)):
-            # On transfert le bytecode[address] à l'adresse.
-            self.listMemoireROM.item(str(address),
-                                     values=('0x' + format(address, '#06X')[2:],
-                                             format(code[address], '#06x'),
-                                             str(code[address])))
-
-        # On appelle la fonction approprié pour charger le code dans
-        # le micro-ordinateur.
-        self.computer.load(code)
-
+        # On transfert.
+        self.transfert(code)
         # Fin de callbackCharger.
         return
 
@@ -474,19 +463,18 @@ class VueOrdinateur(Frame):
             04-Micro-Ordinateur pour réinitialiser l'état de la machine
             virtuelle.
 
+            :example:
+
             ..note: Cette fonction est interne à la classe.
 
         """
         # On appelle la fonction approprié.
         self.computer.reset()
         # ----Reinitialise label.text
-        self.stringOuput = ''
-        sentence = '........................................' \
-                   '........................................'
-        for y in range(24):
-            self.stringOuput += sentence + '\n'
-        self.stringOuput += sentence
-        self.txtvarConsoleOutput.set(self.stringOuput)
+        self.stringOutput = (('.' * 80) + '\n') * 24 + '.' * 80
+        self.txtvarConsoleOutput.set(self.stringOutput)
+        # ----Reinitialise txtConsoleInput.
+        self.txtConsoleInput.reset()
 
         # ----Reinitialise les listes.
         # --RAM.
@@ -594,14 +582,14 @@ class VueOrdinateur(Frame):
                                             str(value)))
             # Screen : Ouput
             if address >= 0x41FC and address <= 0x49CB:
-                global intTOascii
-                self.stringOuput = self.stringOuput[:address - 0x41FC] + \
-                    str(intTOascii.get(value, '.')) + \
-                    self.stringOuput[1 + address - 0x41FC:]
-                self.txtvarConsoleOutput.set(self.stringOuput)
+                self.stringOutput = self.stringOutput[:address - 0x41FC] + \
+                    str(intTOascii(value)) + \
+                    self.stringOutput[1 + address - 0x41FC:]
+                self.txtvarConsoleOutput.set(self.stringOutput)
             # Keyboard
             elif address >= 0x40FC and address <= 0x41FB:
-                pass
+                self.txtConsoleInput.setCharacter(address - 0x40FC,
+                                                  intTOascii(value))
             self.listMemoireIO.update_idletasks()
             self.listMemoireIO.update()
         # Espace RAM

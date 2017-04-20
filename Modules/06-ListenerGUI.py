@@ -43,6 +43,7 @@ except ImportError:
     importlib.import_module("Modules.04-05-IO")
 # Redéfinition.
 MODE = modEnum.MODE
+asciiTOint = modEnum.asciiTOint
 
 
 class ListenerGUI:
@@ -54,6 +55,11 @@ class ListenerGUI:
         bus pour mettre à jour la GUI s'il y a des changements de valeur
         dans la mémoire ou dans les registres.
 
+        :example:
+        >>> modGUI = __import__("01-01-Ordinateur")
+        >>> gui = modGUI.VueOrdinateur()
+        >>> test = ListenerGUI(gui)
+
     """
 
     # Constructeur.
@@ -61,13 +67,18 @@ class ListenerGUI:
         """
             Constructeur de la classe ListenerGUI.
 
-                        Le constructeur s'occupe de lié ce composant avec la GUI.
+            Le constructeur s'occupe de lié ce composant avec la GUI.
+
+            :example:
+            >>> modGUI = __import__("01-01-Ordinateur")
+            >>> gui = modGUI.VueOrdinateur()
+            >>> test = ListenerGUI(gui)
 
         """
         # À attacher.
         self.bus = None
         self.cpu = None
-        self.IO = None
+        self.io = None
         # GUI.
         self.gui = GUI
         # Variable de comparaisons pour le CPU.
@@ -85,10 +96,13 @@ class ListenerGUI:
         """
             Attache le bus au composant.
 
-                        Cette fonction s'occupe de lié ce composant avec le bus.
+            Cette fonction s'occupe de lié ce composant avec le bus.
 
-                        :param bus: Composant Bus du Micro-Ordinateur.
-                        :type bus: Bus
+            :param bus: Composant Bus du Micro-Ordinateur.
+            :type bus: Bus
+
+            .. note:: La gui Ordinateur l'attache automatiquement.
+
         """
         # On attache le Bus.
         self.bus = bus
@@ -100,10 +114,12 @@ class ListenerGUI:
         """
             Attache le cpu au composant.
 
-                        cette fonction s'occupe de lié ce composant avec le cpu.
+            Cette fonction s'occupe de lié ce composant avec le cpu.
 
-                        :param bus: Composant CPU du Micro-Ordinateur.
-                        :type bus: CPU
+            :param bus: Composant CPU du Micro-Ordinateur.
+            :type bus: CPU
+
+            .. note:: La gui Ordinateur l'attache automatiquement.
 
         """
         # Attache le CPU.
@@ -123,13 +139,16 @@ class ListenerGUI:
         """
             Attache le module I/O au composant.
 
-                        Cette fonction s'occupe de lié ce composant avec le module IO.
+            Cette fonction s'occupe de lié ce composant avec le module IO.
 
-                        :param bus: Composant IO du Micro-Ordinateur.
-                        :type bus: IO
+            :param bus: Composant IO du Micro-Ordinateur.
+            :type bus: IO
+
+            .. note:: La gui Ordinateur l'attache automatiquement.
+
         """
         # On attache le module IO.
-        self.IO = io
+        self.io = io
         # Fin.
         return
 
@@ -208,6 +227,24 @@ class ListenerGUI:
             self.gui.updateMemory("RegS", self.prevRegS)
 
         # Fin.
+        return
+
+    def writeKeyboardBuffer(self, key):
+        """
+            Mets à jour le tampon du clavier.
+
+            Cette fonction mets à jour la mémoire tampon du clavier en
+            transfèrant directement le tout dans la mémoire IO.
+
+            :param keysBuffer: Tabeau mémoire tampon du clavier.
+            :type keysbuffer: str
+
+        """
+        self.io.lockIO.acquire()
+        for i in range(255, 0, -1):
+            self.io.data[i] = self.io.data[i - 1]
+        self.io.data[0] = asciiTOint(key)
+        self.io.lockIO.release()
         return
 
 

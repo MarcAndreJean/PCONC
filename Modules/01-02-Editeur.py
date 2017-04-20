@@ -76,7 +76,7 @@ class VueEditeur(Frame):
     """
 
     # Constructeur.
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, attachOrdinateurGUI=None):
         """
             Constructeur de la classe VueEditeur.
 
@@ -89,6 +89,8 @@ class VueEditeur(Frame):
 
             :param parent: Parent Widget de la classe.
             :type parent: Widget (Tk)
+            :param attachOrdinateurGUI: Interface ordinateur.
+            :type attachOrdinateurGUI: Widget (Tk)
 
             :example:
             >>> test1 = VueEditeur()
@@ -99,6 +101,7 @@ class VueEditeur(Frame):
 
 
         """
+        self.guiOrdinateur = attachOrdinateurGUI
         # Initialise le Frame de l'instance.
         Frame.__init__(self, parent)
 
@@ -121,12 +124,19 @@ class VueEditeur(Frame):
         self.frameCin.grid(column=0, row=0, sticky="NSWE")
         # ----Button.
         self.frameBut = Frame(self.globalFrame)
+        if self.guiOrdinateur is not None:
+            self.butTransfer = ttk.Button(
+                self.frameBut, text="Compiler et Transfèrer dans Ordinateur")
         self.butCompile = ttk.Button(
             self.frameBut, text="Compiler et Sauvegarder")
         self.butSave = ttk.Button(self.frameBut, text="Sauvegarder Code")
         self.butLoad = ttk.Button(self.frameBut,
                                   text="Ouvrir Code")
-        self.butCompile.pack(fill=X, padx=20, pady=35, ipady=15)
+        if self.guiOrdinateur is not None:
+            self.butTransfer.pack(fill=X, padx=20, pady=35, ipady=15)
+            self.butCompile.pack(fill=X, padx=20, ipady=15)
+        else:
+            self.butCompile.pack(fill=X, padx=20, pady=35, ipady=15)
         self.butSave.pack(fill=X, padx=20, pady=3, ipady=10)
         self.butLoad.pack(fill=X, padx=20, pady=3, ipady=10)
         self.frameBut.grid(column=1, row=0, sticky="NWE")
@@ -141,11 +151,46 @@ class VueEditeur(Frame):
         self.statusBar.pack(fill=X)
 
         # Liaison des évènements.
+        if self.guiOrdinateur is not None:
+            self.butTransfer.configure(command=self.__callbackCompileTransfer)
         self.butCompile.configure(command=self.__callbackCompile)
         self.butSave.configure(command=self.__callbackSave)
         self.butLoad.configure(command=self.__callbackLoad)
 
         # Fin de __init__.
+        return
+
+    def __callbackCompileTransfer(self):
+        """
+            Callback pour le bouton «Compiler et Transfert».
+
+            Cette fonction appelle la fonction appropriée du module
+            03-Compiler. Si la compilation est un échec, cette fonction
+            avertie l'utilisateur via une boite système l'erreur
+            (l'information est aussi inscrite sur la barre de statut).
+            Si la compilation est un succès on transfère le code dans
+            l'interface «Ordinateur».
+
+            ..note: Cette fonction est interne à la classe.
+
+
+        """
+        # On compile le code inscrit dans le widget Text.
+        result = modCompiler.compile(self.txtConsoleInput.get("1.0", END))
+        # Si la compilation est un succès.
+        if result[0]:
+            self.statusBar.setText("La compilation est un succès.")
+            # On Transfère le code.
+            self.guiOrdinateur.transfert(result[1])
+            self.statusBar.setText(
+                "La compilation est un succès. Transfert effectué.")
+        # Si la compilation est un échec.
+        else:
+            # On informe l'utilisateur.
+            self.statusBar.setText(result[1])
+            messageBox.showerror(title="Erreur de compilation",
+                                 message=result[1])
+        # Fin callbackCompile.
         return
 
     def __callbackCompile(self):

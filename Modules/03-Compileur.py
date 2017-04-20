@@ -54,12 +54,13 @@ def compile(code):
 
         :example:
         >>> expect = [True,
-        ...           [OPCODE.SET | REGISTRE.A | ADRESSAGE.IMMEDIATE,
-        ...           83,
-        ...           OPCODE.ST | REGISTRE.A | ADRESSAGE.DIRECT,
-        ...           16892,
-        ...           OPCODE.HLT,
-        ...           0]]
+        ...          [OPCODE.SET | REGISTRE.A,
+        ...          83,
+        ...          OPCODE.ST | REGISTRE.A | ADRESSAGE.ADDR,
+        ...          16892,
+        ...          OPCODE.HLT,
+        ...          0]]
+        ...
         >>> result = compile('SETA 83\\nSTA 16892\\nHLT')
         >>> expect == result
         True
@@ -324,6 +325,7 @@ def __compileEx(opcode, valg='', vald=''):
         # Ajoute le mode d'adressage en mode « Argument est une ADRESSE ».
         _16bitsLeft |= ADRESSAGE.ADDR
     elif OPCODE.DTA == _16bitsOPCODE:
+        _16bitsLeft = stringToInt(vald)
         _16bitsRight = stringToInt(vald)
 
     # On retourne nos deux 16 bits de données.
@@ -385,8 +387,6 @@ class CompilationErreur(Exception):
 
         :example:
         >>> val = CompilationErreur("TEST")
-        >>> val
-        CompilationErreur()
         >>> val.value
         'TEST'
 

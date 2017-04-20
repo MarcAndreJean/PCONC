@@ -24,7 +24,7 @@
 
 __author__ = "Francis Emond, Malek Khattech, Mamadou Dia, Marc-Andre Jean"
 __version__ = "1.0"
-__status__ = "Verification"
+__status__ = "Production"
 
 
 class ALU:
@@ -53,6 +53,9 @@ class ALU:
             - EZ (Vrai si A est égal à Zéro)
             - NZ (Vrai si A N'est PAS égal à Zéro)
 
+        :example:
+        >>> test = ALU()
+
 
     """
 
@@ -61,6 +64,9 @@ class ALU:
             Constructeur de la classe ALU.
 
             Le constructeur initialise l'obet de la classe ALU.
+
+            :example:
+            >>> test = ALU()
 
         """
         return
@@ -72,7 +78,8 @@ class ALU:
             Cette fonction permet de retourner la somme de val1 et val2.
 
             :example:
-            >>> fonctionADD(1,2)
+            >>> test = ALU()
+            >>> test.fonctionADD(1,2)
             3
 
             :param val1: Nombre entier de gauche de l'addition.
@@ -94,7 +101,8 @@ class ALU:
             val2.
 
             :example:
-            >>> fonctionSUB(2, 1)
+            >>> test = ALU()
+            >>> test.fonctionSUB(2, 1)
             1
 
             :param val1: Nombre entier de gauche de la soustraction.
@@ -116,7 +124,8 @@ class ALU:
             multiplication de val1 par val2.
 
             :example:
-            >>> fonctionMUL(2, 2)
+            >>> test = ALU()
+            >>> test.fonctionMUL(2, 2)
             4
 
             :param val1: Nombre entier de gauche de la multiplication.
@@ -138,11 +147,12 @@ class ALU:
             entière de val1 par val2.
 
             :example:
-            >>> fonctionDIV(1, 3)
+            >>> test = ALU()
+            >>> test.fonctionDIV(1, 3)
             0
-            >>> fonctionDIV(4, 2)
+            >>> test.fonctionDIV(4, 2)
             2
-            >>> fonctionDIV(16, 2)
+            >>> test.fonctionDIV(16, 2)
             8
 
             :param val1: Nombre entier de gauche de la division.
@@ -168,14 +178,15 @@ class ALU:
             logique entre deux valeurs val1 et val2.
 
             :example:
-            >>> fonctionOR(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionOR(1, 1)
             1
-            >>> fonctionOR(0, 1)
+            >>> test.fonctionOR(0, 1)
             1
-            >>> fonctionOR(0, 0)
+            >>> test.fonctionOR(0, 0)
             0
-            >>> fonctionOR(0xAFAF, 0xFAFA)
-            0xFFFF
+            >>> test.fonctionOR(0xAFAF, 0xFAFA)
+            65535
 
             :param val1: Nombre entier de gauche du OR logique.
             :type val1: int
@@ -196,14 +207,15 @@ class ALU:
             logique entre deux valeurs val1 et val2.
 
             :example:
-            >>> fonctionAND(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionAND(1, 1)
             1
-            >>> fonctionAND(0, 1)
+            >>> test.fonctionAND(0, 1)
             0
-            >>> fonctionAND(0, 0)
+            >>> test.fonctionAND(0, 0)
             0
-            >>> fonctionAND(0xAFAF, 0xFAFA)
-            0xFFFF
+            >>> test.fonctionAND(0xAFAF, 0xFAFA)
+            43690
 
             :param val1: Nombre entier de gauche du AND logique.
             :type val1: int
@@ -224,15 +236,16 @@ class ALU:
             logique entre deux valeurs val1 et val2.
 
             :example:
-            >>> fonctionXOR(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionXOR(1, 1)
             0
-            >>> fonctionXOR(0, 1)
+            >>> test.fonctionXOR(0, 1)
             1
-            >>> fonctionXOR(1, 0)
+            >>> test.fonctionXOR(1, 0)
             1
-            >>> fonctionXOR(0, 0)
+            >>> test.fonctionXOR(0, 0)
             0
-            >>> fonctionXOR(0xAFAF, 0xFAFA)
+            >>> test.fonctionXOR(0xAFAF, 0xFAFA)
             21845
 
             :param val1: Nombre entier de gauche du XOR logique.
@@ -254,14 +267,15 @@ class ALU:
             logique sur une valeur.
 
             :example:
-            >>> fonctionNOT(1)
-            0
-            >>> fonctionNOT(0)
-            1
-            >>> fonctionNOT(0xAFAF)
-            44976
-            >>> fonctionNOT(0xFAFA)
-            0xFFFF
+            >>> test = ALU()
+            >>> test.fonctionNOT(1)
+            65534
+            >>> test.fonctionNOT(0)
+            65535
+            >>> test.fonctionNOT(0xAFAF)
+            20560
+            >>> test.fonctionNOT(0xFAFA)
+            1285
 
             :param val: Nombre entier pour le NOT logique.
             :type val: int
@@ -280,15 +294,16 @@ class ALU:
             val2 et retourne le résultat (vrai/faux).
 
             :example:
-            >>> fonctionLT(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionLT(1, 1)
             0
-            >>> fonctionLT(0, 1)
+            >>> test.fonctionLT(0, 1)
             1
-            >>> fonctionLT(1, 0)
+            >>> test.fonctionLT(1, 0)
             0
-            >>> fonctionLT(0, 0)
+            >>> test.fonctionLT(0, 0)
             0
-            >>> fonctionLT(0xAFAF, 0xFAFA)
+            >>> test.fonctionLT(0xAFAF, 0xFAFA)
             1
 
             :param val1: Nombre entier de gauche de l'évaluation LT.
@@ -310,15 +325,16 @@ class ALU:
             val2 et retourne le résultat (vrai/faux).
 
             :example:
-            >>> fonctionGT(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionGT(1, 1)
             0
-            >>> fonctionGT(0, 1)
+            >>> test.fonctionGT(0, 1)
             0
-            >>> fonctionGT(1, 0)
+            >>> test.fonctionGT(1, 0)
             1
-            >>> fonctionGT(0, 0)
+            >>> test.fonctionGT(0, 0)
             0
-            >>> fonctionGT(0xAFAF, 0xFAFA)
+            >>> test.fonctionGT(0xAFAF, 0xFAFA)
             0
 
             :param val1: Nombre entier de gauche de l'évaluation GT.
@@ -340,15 +356,16 @@ class ALU:
             égal à val2 et retourne le résultat (vrai/faux).
 
             :example:
-            >>> fonctionLE(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionLE(1, 1)
             1
-            >>> fonctionLE(0, 1)
+            >>> test.fonctionLE(0, 1)
             1
-            >>> fonctionLE(1, 0)
+            >>> test.fonctionLE(1, 0)
             0
-            >>> fonctionLE(0, 0)
+            >>> test.fonctionLE(0, 0)
             1
-            >>> fonctionLE(0xAFAF, 0xFAFA)
+            >>> test.fonctionLE(0xAFAF, 0xFAFA)
             1
 
             :param val1: Nombre entier de gauche de l'évaluation LE.
@@ -370,15 +387,16 @@ class ALU:
             égal à val2 et retourne le résultat (vrai/faux).
 
             :example:
-            >>> fonctionGE(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionGE(1, 1)
             1
-            >>> fonctionGE(0, 1)
+            >>> test.fonctionGE(0, 1)
             0
-            >>> fonctionGE(1, 0)
+            >>> test.fonctionGE(1, 0)
             1
-            >>> fonctionGE(0, 0)
+            >>> test.fonctionGE(0, 0)
             1
-            >>> fonctionGE(0xAFAF, 0xFAFA)
+            >>> test.fonctionGE(0xAFAF, 0xFAFA)
             0
 
             :param val1: Nombre entier de gauche de l'évaluation GE.
@@ -400,15 +418,16 @@ class ALU:
             et retourne le résultat (vrai/faux).
 
             :example:
-            >>> fonctionEQ(1, 1)
+            >>> test = ALU()
+            >>> test.fonctionEQ(1, 1)
             1
-            >>> fonctionEQ(0, 1)
+            >>> test.fonctionEQ(0, 1)
             0
-            >>> fonctionEQ(1, 0)
+            >>> test.fonctionEQ(1, 0)
             0
-            >>> fonctionEQ(0, 0)
+            >>> test.fonctionEQ(0, 0)
             1
-            >>> fonctionEQ(0xAFAF, 0xFAFA)
+            >>> test.fonctionEQ(0xAFAF, 0xFAFA)
             0
 
             :param val1: Nombre entier de gauche de l'évaluation EQ.
@@ -429,11 +448,12 @@ class ALU:
             Cette fonction permet d'évaluer si val est égal à zéro.
 
             :example:
-            >>> fonctionEZ(1)
+            >>> test = ALU()
+            >>> test.fonctionEZ(1)
             0
-            >>> fonctionEZ(0)
+            >>> test.fonctionEZ(0)
             1
-            >>> fonctionEZ(0xAFAF)
+            >>> test.fonctionEZ(0xAFAF)
             0
 
             :param val: Nombre entier de l'évaluation EZ.
@@ -452,11 +472,12 @@ class ALU:
             Cette fonction permet d'évaluer si val n'est égal pas à zéro.
 
             :example:
-            >>> fonctionNZ(1)
+            >>> test = ALU()
+            >>> test.fonctionNZ(1)
             1
-            >>> fonctionNZ(0)
+            >>> test.fonctionNZ(0)
             0
-            >>> fonctionNZ(0xAFAF)
+            >>> test.fonctionNZ(0xAFAF)
             1
 
             :param val: Nombre entier de l'évaluation NZ.

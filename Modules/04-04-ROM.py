@@ -32,11 +32,11 @@ __status__ = "Production"
 # Importation des modules nécessaires.
 try:
     modEnum = __import__("05-Enum")
-    __import__("04-01-Bus")
+    modBus = __import__("04-01-Bus")
 except ImportError:
     import importlib
     modEnum = importlib.import_module("Modules.05-Enum")
-    importlib.import_module("Modules.04-01-Bus")
+    modBus = importlib.import_module("Modules.04-01-Bus")
 # Redéfinition.
 MODE = modEnum.MODE
 
@@ -53,6 +53,9 @@ class ROM:
         la classe vérifie si elle doit effectuer une lecture ou
         écriture en mémoire.
 
+        :example:
+        >>> test = ROM(modBus.Bus())
+
 
     """
 
@@ -61,13 +64,17 @@ class ROM:
         """
             Constructeur de la classe ROM.
 
-                        Le constructeur s'occupe d'initialiser la mémoire et lie
-                        ce composant avec le bus.
+            Le constructeur s'occupe d'initialiser la mémoire et lie
+            ce composant avec le bus.
 
-                        :param bus: Composant Bus du Micro-Ordinateur.
-                        :type bus: Bus
+            :example:
+            >>> test = ROM(modBus.Bus())
+
+            :param bus: Composant Bus du Micro-Ordinateur.
+            :type bus: Bus
 
         """
+        self.clock = False
         # Bus.
         self.bus = bus
         self.bus.register(self)
@@ -82,6 +89,12 @@ class ROM:
 
             Cette fonction est appelé lorsqu'un event est émit
             sur le bus. Elle gère l'écriture et la lecture en mémoire.
+
+            :example:
+            >>> bus = modBus.Bus()
+            >>> test = ROM(bus)
+            >>> test.event()
+            >>> bus.event()
 
         """
         # Si ce n'est pas de la mémoire ROM on quitte.
@@ -99,18 +112,6 @@ class ROM:
             self._data[self.bus.address] = self.bus.data
         return
 
-    def clock(self):
-        """
-            Récepteur pour le signal clock.
-
-            Cette fonction est appelé lorsqu'un coup d'horloge est émit
-            sur le bus. Elle gère la réinitialisation de la mémoire si
-            le bus est en mode RESET.
-
-        """
-        # Fin de la fonction.
-        return
-
     def uploadProgram(self, bytecode):
         """
             Fonction pour charger bytecode dans la ROM.
@@ -119,7 +120,8 @@ class ROM:
             la mémoire ROM.
 
             :example:
-            >>> test = ROM()
+            >>> bus = modBus.Bus()
+            >>> test = ROM(bus)
             >>> test.uploadProgram([0xFAFA, 0xAFAF, 0x0000, 0xFFFF])
 
             :param bytecode: Tableau de int (16 bits) d'un programme

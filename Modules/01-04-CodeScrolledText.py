@@ -210,11 +210,11 @@ class CodeScrolledText(Frame):
         Text, un widget Label et un widget Scrollbar.
 
         :example:
-        >>> test = CodeScrolledText(None)
+        >>> test = CodeScrolledText()
 
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         """
             Constructeur de CodeScrolledText.
 
@@ -223,6 +223,7 @@ class CodeScrolledText(Frame):
 
             :example:
             >>> test = CodeScrolledText(None)
+            >>> test = CodeScrolledText(Frame())
 
             :param parent: Widget Parent de la classe.
             :type parent: Widget (Tk)
@@ -322,6 +323,8 @@ class CodeScrolledText(Frame):
             :example:
             >>> test = CodeScrolledText(None)
             >>> test.insert('0.0', "test")
+            >>> test.get('0.0', END)
+            u'test\\n'
 
             :param start: Position début du texte où insérer.
             :type start: str

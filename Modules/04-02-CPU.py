@@ -30,12 +30,12 @@ __status__ = "Production"
 # Importation des modules nécessaires.
 try:
     modEnum = __import__("05-Enum")
-    __import__("04-01-Bus")
+    modBus = __import__("04-01-Bus")
     modALU = __import__("04-03-ALU")
 except ImportError:
     import importlib
     modEnum = importlib.import_module("Modules.05-Enum")
-    importlib.import_module("Modules.04-01-Bus")
+    modBus = importlib.import_module("Modules.04-01-Bus")
     modALU = importlib.import_module("Modules.04-03-ALU")
 # Redéfinition.
 OPCODE = modEnum.OPCODE
@@ -66,6 +66,9 @@ class CPU:
         telle que présentée dans le document de
         spécification.
 
+        :example:
+        >>> test = CPU(modBus.Bus())
+
 
     """
 
@@ -75,6 +78,9 @@ class CPU:
 
             Le constructeur initialise les composants du CPU dont l'ALU.
             Elle s'occupe aussi de lier le CPU avec le bus en entrée.
+
+            :example:
+            >>> test = CPU(modBus.Bus())
 
             :param bus: Le bus du MicroOrdinateur.
             :type bus: Bus
@@ -157,6 +163,13 @@ class CPU:
             Cette fonction est appelé lorsqu'un coup d'horloge est émit
             sur le bus. Elle gère la réinitialisation du CPU si le bus est
             en mode RESET. Sinon le CPU fetch la prochaine instruction.
+
+            :example:
+            >>> bus = modBus.Bus()
+            >>> test = CPU(bus)
+            >>> test.clock()
+            >>> bus.clock()
+            >>> bus.event()
 
         """
         # On réinitialise le CPU si le bus est en mode reset.

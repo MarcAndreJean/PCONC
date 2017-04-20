@@ -61,7 +61,7 @@ class VueGlobal(Frame):
         de spécifications avec le croquis des interfaces.
 
         :example:
-        >>> test = VueGlobal(None)
+        >>> test = VueGlobal()
         >>> test = VueGlobal(Tk())
 
 
@@ -100,7 +100,8 @@ class VueGlobal(Frame):
 
         # Crée les deux sous-vues.
         self.vueOrdinateur = modOrdinateur.VueOrdinateur(self.vueTabs)
-        self.vueEditeur = modEditeur.VueEditeur(self.vueTabs)
+        self.vueEditeur = modEditeur.VueEditeur(self.vueTabs,
+                                                self.vueOrdinateur)
 
         # Pack les vues dans le gestionnaire d'onglet (Tab) et Pack le
         # gestionnaire d'onglet dans le parent.

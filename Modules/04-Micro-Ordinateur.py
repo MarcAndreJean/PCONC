@@ -79,6 +79,9 @@ class MicroOrdinateur():
             supplémentaires (pour permettre une compatibilité pour
             une réutilisation ou utilisation externe de cette classe).
 
+            :example:
+            >>> test = MicroOrdinateur()
+
             :param extracomponents: Liste de composants supplémentaires.
             :type extracomponents: List
 
@@ -103,17 +106,20 @@ class MicroOrdinateur():
         self.ram = modRAM.RAM(self.bus)
         # Attachement des composants supplémentaires (s'il y a lieu).
         self.xtracomp = extracomponents
-        if self.xtracomp is not None and len(self.xtracomp) > 0:
-            for xcomp in self.xtracomp:
-                # On attache le bus.
-                if xcomp.attachBus:
-                    xcomp.attachBus(self.bus)
-                # On attache le CPU.
-                if xcomp.attachCPU:
-                    xcomp.attachCPU(self.cpu)
-                # On attache le module IO.
-                if xcomp.attachIO:
-                    xcomp.attachIO(self.io)
+        if self.xtracomp is not None:
+            if not isinstance(self.xtracomp, list):
+                self.xtracomp = [self.xtracomp]
+            if len(self.xtracomp) > 0:
+                for xcomp in self.xtracomp:
+                    # On attache le bus.
+                    if xcomp.attachBus:
+                        xcomp.attachBus(self.bus)
+                    # On attache le CPU.
+                    if xcomp.attachCPU:
+                        xcomp.attachCPU(self.cpu)
+                    # On attache le module IO.
+                    if xcomp.attachIO:
+                        xcomp.attachIO(self.io)
         # Fin de __init__.
         return
 
@@ -190,6 +196,7 @@ class MicroOrdinateur():
             :example:
             >>> test = MicroOrdinateur()
             >>> test.toggleClock()
+            >>> test.toggleClock()
 
         """
         global clockActive
@@ -220,6 +227,10 @@ class MicroOrdinateur():
             Cette fonction exécute une simple ligne de commande. Elle
             utilise le bytecode donné en argument.
 
+            :example:
+            >>> test = MicroOrdinateur()
+            >>> test.execute([0x0000, 0x0000])
+
             :param bytecode: Code à exécuter.
             :type bytecode: int[] (16 bits)
 
@@ -246,6 +257,24 @@ class MicroOrdinateur():
 
 
 class RunningClock(Thread):
+    """
+        class RunningClock
+        ========================
+
+        Cette classe s'occupe de l'horloge du MicroOrdinateur.
+
+        :example:
+        >>> var = MicroOrdinateur()
+        >>> test = RunningClock()
+        >>> test.start()
+        >>> var.bus.mode = MODE.HALT
+
+        ..note: L'horloge est intégré au micro-ordinateur. La fonction
+                tick() et toggleClock() fait appel à fonction
+                _runningClock() dans un Thread pour permettre une
+                utilisation asynchrone du micro-ordinateur et de la GUI.
+
+    """
 
     def run(self):
         """

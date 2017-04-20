@@ -51,6 +51,9 @@ class Bus:
         En addition de ces trois sous-bus (total de 48 lignes), le bus
         système a aussi une ligne (un bit) pour l'horloge du système.
 
+        :example:
+        >>> test = Bus()
+
 
     """
 
@@ -60,19 +63,29 @@ class Bus:
 
             Le constructeur initialise les attributs de la classe bus.
 
+            :example:
+            >>> test = Bus()
+
         """
         self._component = []  # liste des composantes de la machine
         self.data = 0x0000        # valeur sur le bus
         self.address = 0x0000      # adresse d'operation
-        self.mode = MODE.END   # 0:inerte, 1:write, 2:read, 4:END, 8:RESET, 9:HALT
+        self.mode = MODE.END   # 0:inerte, 1:write, 2:read,
+        # 4:END, 8:RESET, 9:HALT
+        # Fin.
         return
 
     def register(self, component):
         """
             Fonction pour ajouter un composant.
 
-            Cette fonction permet d'ajouter des elements dans la liste des composantes de l'ordinateur
-            elle possede comme parametre le composant a ajouter dans la liste «component ».
+            Cette fonction permet d'ajouter des elements dans la liste des
+            composantes de l'ordinateur elle possede comme parametre le
+            composant a ajouter dans la liste «component ».
+
+            :example:
+            >>> test = Bus()
+            >>> test.register(Bus())
 
             :param component: Composant du Micro-Ordinateur à lié.
             :type component: class
@@ -88,6 +101,11 @@ class Bus:
 
             Cette fonction appelle la fonction event() de chaque
             composante (si elle existe).
+
+            :example:
+            >>> test = Bus()
+            >>> test.register(Bus())
+            >>> test.event()
 
         """
         # Si la liste de composant n'est pas vide.
@@ -107,6 +125,11 @@ class Bus:
             instructions en agissant particulièrement sur le cpu. Elle
             appelle les fonctions clock() des composantes se trouvant
             dans la liste de composante.
+
+            :example:
+            >>> test = Bus()
+            >>> test.register(Bus())
+            >>> test.clock()
 
         """
         # On quitte la fonction si le bus n'est pas prêt à recevoir un

@@ -32,13 +32,15 @@ __status__ = "Production"
 # Importation des modules nécessaires.
 try:
     modEnum = __import__("05-Enum")
-    __import__("04-01-Bus")
+    modBus = __import__("04-01-Bus")
 except ImportError:
     import importlib
     modEnum = importlib.import_module("Modules.05-Enum")
-    importlib.import_module("Modules.04-01-Bus")
+    modBus = importlib.import_module("Modules.04-01-Bus")
 # Redéfinition.
 MODE = modEnum.MODE
+
+from threading import Lock
 
 
 class IO:
@@ -50,6 +52,8 @@ class IO:
         À chaque coup d'horloge (clock/event), la classe vérifie si elle doit
         effectuer une lecture ou écriture en mémoire.
 
+        :example:
+        >>> test = IO(modBus.Bus())
 
     """
 
@@ -58,19 +62,23 @@ class IO:
         """
             Constructeur de la classe IO.
 
-                        Le constructeur s'occupe d'initialiser la mémoire IO et lie
-                        ce composant avec le bus.
+            Le constructeur s'occupe d'initialiser la mémoire IO et lie
+            ce composant avec le bus.
 
-                        :param bus: Composant Bus du Micro-Ordinateur.
-                        :type bus: Bus
+            :example:
+            >>> test = IO(modBus.Bus())
+
+            :param bus: Composant Bus du Micro-Ordinateur.
+            :type bus: Bus
 
         """
+        self.lockIO = Lock()
         # Bus.
         self.bus = bus
         self.bus.register(self)
 
         # Tableau de int pour représenter la mémoire IO.
-        self._data = [0] * (0x3F03 + 1)
+        self.data = [0] * (0x3F03 + 1)
         return
 
     def event(self):
@@ -80,6 +88,12 @@ class IO:
             Cette fonction est appelé lorsqu'un event est émit
             sur le bus. Elle gère l'écriture et la lecture en mémoire.
 
+            :example:
+            >>> bus = modBus.Bus()
+            >>> test = IO(bus)
+            >>> test.event()
+            >>> bus.event()
+
         """
         # Si ce n'est pas de I/O, on quitte.
         if self.bus.address < 0x40FC or self.bus.address > 0x7FFF:
@@ -88,12 +102,16 @@ class IO:
         if self.bus.mode == MODE.READ:
             # On mets la valeur de la case mémoire à l'adresse bus.address
             # dans le bus.data.
-            self.bus.data = self._data[self.bus.address - 0x40FC]
+            self.lockIO.acquire()
+            self.bus.data = self.data[self.bus.address - 0x40FC]
+            self.lockIO.release()
         # Si en mode ÉCRITURE:
         elif self.bus.mode == MODE.WRITE:
             # On mets la valeur de bus.data dans la case mémoire
             # à l'adresse bus.address.
-            self._data[self.bus.address - 0x40FC] = self.bus.data
+            self.lockIO.acquire()
+            self.data[self.bus.address - 0x40FC] = self.bus.data
+            self.lockIO.release()
         return
 
     def clock(self):
@@ -104,17 +122,20 @@ class IO:
             sur le bus. Elle gère la réinitialisation de la mémoire si
             le bus est en mode RESET.
 
+            :example:
+            >>> bus = modBus.Bus()
+            >>> test = IO(bus)
+            >>> test.clock()
+            >>> bus.clock()
+
         """
         # On réinitialise la mémoire si le bus est en mode reset.
         if self.bus.mode == MODE.RESET:
+            self.lockIO.acquire()
             for i in range(0, 0x3F03 + 1):
-                self._data[i] = 0x0000
+                self.data[i] = 0x0000
+            self.lockIO.release()
         # Fin de la fonction.
-        return
-
-    def writeKeyboardBuffer(self, key):
-        """
-        """
         return
 
 

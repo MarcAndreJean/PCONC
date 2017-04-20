@@ -32,11 +32,11 @@ __status__ = "Production"
 # Importation des modules nécessaires.
 try:
     modEnum = __import__("05-Enum")
-    __import__("04-01-Bus")
+    modBus = __import__("04-01-Bus")
 except ImportError:
     import importlib
     modEnum = importlib.import_module("Modules.05-Enum")
-    importlib.import_module("Modules.04-01-Bus")
+    modBus = importlib.import_module("Modules.04-01-Bus")
 # Redéfinition.
 MODE = modEnum.MODE
 
@@ -50,6 +50,9 @@ class RAM:
         coup d'horloge (clock/event), la classe vérifie si elle doit effectuer
         une lecture ou écriture en mémoire.
 
+        :example:
+        >>> test = RAM(modBus.Bus())
+
 
     """
 
@@ -58,11 +61,14 @@ class RAM:
         """
             Constructeur de la classe RAM.
 
-                        Le constructeur s'occupe d'initialiser la mémoire et lie
-                        ce composant avec le bus.
+            Le constructeur s'occupe d'initialiser la mémoire et lie
+            ce composant avec le bus.
 
-                        :param bus: Composant Bus du Micro-Ordinateur.
-                        :type bus: Bus
+            :example:
+            >>> test = RAM(modBus.Bus())
+
+            :param bus: Composant Bus du Micro-Ordinateur.
+            :type bus: Bus
 
         """
         # Bus.
@@ -79,6 +85,12 @@ class RAM:
 
             Cette fonction est appelé lorsqu'un event est émit
             sur le bus. Elle gère l'écriture et la lecture en mémoire.
+
+            :example:
+            >>> bus = modBus.Bus()
+            >>> test = RAM(bus)
+            >>> test.event()
+            >>> bus.event()
 
         """
         # Si ce n'est pas de la mémoire RAM, on quitte.
@@ -103,6 +115,12 @@ class RAM:
             Cette fonction est appelé lorsqu'un coup d'horloge est émit
             sur le bus. Elle gère la réinitialisation de la mémoire si
             le bus est en mode RESET.
+
+            :example:
+            >>> bus = modBus.Bus()
+            >>> test = RAM(bus)
+            >>> test.clock()
+            >>> bus.clock()
 
         """
         # On réinitialise la mémoire si le bus est en mode reset.

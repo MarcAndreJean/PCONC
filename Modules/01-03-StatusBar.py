@@ -50,10 +50,13 @@ class StatusBar(Frame):
         fonctions (excluant le constructeur) pour aiser l'affichage du
         texte.
 
+        :example:
+        >>> test = StatusBar()
+
 
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         """
             Constructeur de StatusBar.
 
@@ -96,7 +99,6 @@ class StatusBar(Frame):
             :example:
             >>> test = StatusBar(None)
             >>> test.setText("test")
-            >>> test.setText("test")
 
             :param format: Nouveau texte de la StatusBar.
             :type format: str
@@ -110,7 +112,7 @@ class StatusBar(Frame):
         self.label.config(text=format % args)
         self.label.update_idletasks()
         # Fin de setText.
-        return self
+        return
 
     def clear(self):
         """

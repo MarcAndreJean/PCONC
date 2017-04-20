@@ -24,6 +24,84 @@
 
 """
 
+# Dictionnaire Whitelist du code ASCII permit.
+
+
+def intTOascii(code):
+    """
+        Convertit code en lettre ascii.
+
+        Cette fonction convertit le nombre code en une lettre ascii.
+
+        :example:
+        >>> intTOascii(65)
+        'A'
+        >>> intTOascii(0xFFFF)
+        '.'
+
+        :param code: Nombre représentant une lettre ascii.
+        :type code: int
+        :return: Lettre ascii.
+        :rtype: str
+
+    """
+    # Contrôle des types.
+    if isinstance(code, str):
+        if len(code) == 0:
+            return '.'
+        elif len(code) > 1:
+            code = ord(code[-1])
+        else:
+            code = ord(code)
+    elif isinstance(code, unicode):
+        return '.'
+
+    # Retourne un ' ' si c'est une code non permit.
+    if code < 0x20 or code > 0x7E:
+        return '.'
+    # Sinon retourne le code ascii normal.
+    else:
+        return chr(code)
+
+
+def asciiTOint(code):
+    """
+        Convertit lettre ascii en int.
+
+        Cette fonction convertit une lettre ascii en code.
+
+        :example:
+        >>> asciiTOint('a')
+        97
+        >>> asciiTOint('è')
+        0
+
+        :param code: Une lettre ascii.
+        :type code: str
+        :return: code ascii.
+        :rtype: int
+
+    """
+    # Contrôle des types.
+    if isinstance(code, str):
+        if len(code) == 0:
+            return 0
+        elif len(code) > 1:
+            if code[-1] < 0x0000 or code[-1] > 0x007E:
+                return 0
+            return ord(code[-1])
+        else:
+            return ord(code)
+    elif isinstance(code, unicode):
+        return 0
+
+    # Retourne 0 si c'est une lettre non permise.
+    if code < 0x0000 or code > 0x007E:
+        return 0
+    # Sinon retourne le code ascii normal.
+    else:
+        return ord(code)
+
 
 def enum(**enums):
     """
@@ -32,7 +110,7 @@ def enum(**enums):
         :return: Un type Enum
         :rtype: Enum
 
-        >>> ENUMTEST = __enum(VRAI = True, FAUX = False)
+        >>> ENUMTEST = enum(VRAI = True, FAUX = False)
         >>> ENUMTEST.VRAI
         True
         >>> ENUMTEST.FAUX
@@ -79,7 +157,7 @@ OPCODE = enum(NOP=0x0000,
               EZ=0x3600,
               NZ=0x3700,
               # --Chaine de caractères.
-              DTA=0XFFFF)
+              DTA=0xFFFF)
 
 # Enumération pour le registre.
 REGISTRE = enum(A=0x0001, B=0x0002, C=0x0003, D=0x0004)
