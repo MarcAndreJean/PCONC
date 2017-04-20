@@ -31,9 +31,11 @@ __status__ = "Production"
 # Importation des modules nécessaires.
 try:
     modVue = __import__("01-01-Ordinateur")
+    modEnum = __import__("05-Enum")
 except ImportError:
     import importlib
     modVue = importlib.import_module("Modules.01-01-Ordinateur")
+    modEnum = importlib.import_module("Modules.05-Enum")
 
 
 # Importation de Tkinter selon la version de Python.
@@ -51,7 +53,7 @@ if __name__ == '__main__':
     root = Tk()
 
     # Création de la vue globale dans le root.
-    vueGlobal = modVue.VueOrdinateur(root, modVue.TypeUse.LIGNECOMMANDE)
+    vueGlobal = modVue.VueOrdinateur(root, modEnum.TYPEUSE.LIGNECOMMANDE)
     vueGlobal.pack(fill=BOTH, expand=True)
 
     # Définition des paramètres pour le root.

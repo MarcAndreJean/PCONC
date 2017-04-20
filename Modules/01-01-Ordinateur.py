@@ -47,7 +47,7 @@ except ImportError:
     modListener = importlib.import_module("Modules.06-ListenerGUI")
 # Redéfinition.
 intTOascii = modEnum.intTOascii
-enum = modEnum.enum
+TYPEUSE = modEnum.TYPEUSE
 
 # Importation de Tkinter selon la version de Python.
 # Python 2 seulement:
@@ -61,13 +61,7 @@ except ImportError:
     from tkinter import *
     import tkinter.ttk as ttk
     import tkinter.filedialog as fileDialog
-    import tkFont
-
-
-# Enum des différents types d'utilisation de la Vue Ordinateur
-# NORMAL = Utilisation avec l'application.
-# LIGNECOMMANDE = Utilisation en ligne de commande.
-TypeUse = enum(NORMAL=1, LIGNECOMMANDE=2)
+    import tkinter.font as tkFont
 
 
 class VueOrdinateur(Frame):
@@ -84,7 +78,7 @@ class VueOrdinateur(Frame):
     """
 
     # Constructeur.
-    def __init__(self, parent=None, typeUse=TypeUse.NORMAL):
+    def __init__(self, parent=None, typeUse=TYPEUSE.NORMAL):
         """
             Constructeur de la classe VueOrdinateur.
 
@@ -104,8 +98,8 @@ class VueOrdinateur(Frame):
             temps réel du code assembleur.
 
             :example:
-            >>> test1 = VueOrdinateur(Tk(), TypeUse.NORMAL)
-            >>> test2 = VueOrdinateur(Tk(), TypeUse.LIGNECOMMANDE)
+            >>> test1 = VueOrdinateur(Tk(), TYPEUSE.NORMAL)
+            >>> test2 = VueOrdinateur(Tk(), TYPEUSE.LIGNECOMMANDE)
 
             :param parent: Parent Widget de la classe.
             :type parent: Widget (Tk)
@@ -134,7 +128,7 @@ class VueOrdinateur(Frame):
         # En mode NORMAL on crée des boutons pour charger un exécutable,
         # et des boutons pour l'exécuter (Réinitialiser, Générer coup
         # d'horloge et Démarrer/Arrêter horloge).
-        if typeUse == TypeUse.NORMAL:
+        if typeUse == TYPEUSE.NORMAL:
             # --Button.
             self.frameBut = Frame(self)
             self.butCharger = ttk.Button(
@@ -303,7 +297,7 @@ class VueOrdinateur(Frame):
         # cellules s'étire et que le «Grid» remplit l'espace requis.
         for y in range(3):
             self.grid_rowconfigure(y, minsize=100, weight=1)
-        if typeUse == TypeUse.NORMAL:
+        if typeUse == TYPEUSE.NORMAL:
             for x in range(1, 3):
                 self.grid_columnconfigure(x, minsize=200, weight=2)
             self.grid_columnconfigure(0, minsize=100, weight=1)
@@ -313,7 +307,7 @@ class VueOrdinateur(Frame):
 
         # ___________________________________________________________________
         # Liaison des évènements.
-        if typeUse == TypeUse.NORMAL:
+        if typeUse == TYPEUSE.NORMAL:
             self.butCharger.configure(command=self.__callbackCharger)
             self.butReset.configure(command=self.__callbackReset)
             self.butTick.configure(command=self.__callbackTick)

@@ -46,15 +46,18 @@ def intTOascii(code):
 
     """
     # Contrôle des types.
-    if isinstance(code, str):
-        if len(code) == 0:
+    try:
+        if isinstance(code, str):
+            if len(code) == 0:
+                return '.'
+            elif len(code) > 1:
+                code = ord(code[-1])
+            else:
+                code = ord(code)
+        elif isinstance(code, unicode):
             return '.'
-        elif len(code) > 1:
-            code = ord(code[-1])
-        else:
-            code = ord(code)
-    elif isinstance(code, unicode):
-        return '.'
+    except NameError:
+        pass
 
     # Retourne un ' ' si c'est une code non permit.
     if code < 0x20 or code > 0x7E:
@@ -83,17 +86,20 @@ def asciiTOint(code):
 
     """
     # Contrôle des types.
-    if isinstance(code, str):
-        if len(code) == 0:
-            return 0
-        elif len(code) > 1:
-            if code[-1] < 0x0000 or code[-1] > 0x007E:
+    try:
+        if isinstance(code, str):
+            if len(code) == 0:
                 return 0
-            return ord(code[-1])
-        else:
-            return ord(code)
-    elif isinstance(code, unicode):
-        return 0
+            elif len(code) > 1:
+                if code[-1] < 0x0000 or code[-1] > 0x007E:
+                    return 0
+                return ord(code[-1])
+            else:
+                return ord(code)
+        elif isinstance(code, unicode):
+            return 0
+    except NameError:
+        pass
 
     # Retourne 0 si c'est une lettre non permise.
     if code < 0x0000 or code > 0x007E:
@@ -119,6 +125,8 @@ def enum(**enums):
     """
     return type('Enum', (), enums)
 
+# Énumération pour la vue 01-01-Ordinateur.
+TYPEUSE = enum(NORMAL=1, LIGNECOMMANDE=2)
 
 # Énumération pour le mode du bus.
 MODE = enum(INERTE=0x0000,

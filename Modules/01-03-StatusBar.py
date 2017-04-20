@@ -37,7 +37,7 @@ try:
 except ImportError:
     from tkinter import *
     import tkinter.ttk as ttk
-    import tkFont
+    import tkinter.font as tkFont
 
 
 class StatusBar(Frame):
