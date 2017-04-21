@@ -314,7 +314,7 @@ def __compileEx(opcode, valg='', vald=''):
         else:
             # Mode d'adressage en mode « Argument est une adresse vers un
             # registre ».
-            _16bitsLeft |= ADRESSAGE.ADDR_OF_REG
+            _16bitsLeft |= ADRESSAGE.ADDR_FROM_REG
     # Si l'OPCODE a une adresse dans les bits droits
     elif {OPCODE.JMP: True, OPCODE.JMZ: True,
           OPCODE.JMO: True, OPCODE.JMC: True,

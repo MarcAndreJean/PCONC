@@ -432,17 +432,16 @@ class CPU:
             # Si le OPCODE est LD (résoudre l'adresse)
             elif opcode == OPCODE.LD:
                 self._readAddress()
+                self.bus.mode = MODE.READ
+                self.bus.event()
                 self._setReg(regG, self.bus.data)
 
             # Si le OPCODE est ST (résoudre l'adresse)
             elif opcode == OPCODE.ST:
-                if adressage == ADRESSAGE.ADDR_OF_REG:
-                    self._setReg(valD, self._getReg(regG))
-                else:
-                    self._readAddress()
-                    self.bus.data = self._getReg(regG)
-                    self.bus.mode = MODE.WRITE
-                    self.bus.event()
+                self._readAddress()
+                self.bus.data = self._getReg(regG)
+                self.bus.mode = MODE.WRITE
+                self.bus.event()
 
             # Si le OPCODE est MV
             elif opcode == OPCODE.MV:
